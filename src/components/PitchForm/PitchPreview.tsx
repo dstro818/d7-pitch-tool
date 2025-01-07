@@ -17,20 +17,36 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const formatPitchText = () => {
     const parts = [];
     
+    // Title and Artists Section
+    if (data.title) {
+      if (data.artists) {
+        parts.push(`${data.title} - ${data.artists}`);
+      } else {
+        parts.push(data.title);
+      }
+    }
+    
+    // Genre and Theme Section
     if (data.genres && data.genres.length > 0) {
       parts.push(`[${data.genres.join(', ')}]`);
     }
     
-    if (data.title) {
-      parts.push(data.title);
-    }
-    
-    if (data.artists) {
-      parts.push(`ft. ${data.artists}`);
-    }
-    
+    // Main Description
     if (data.theme) {
       parts.push(data.theme);
+    }
+    
+    // Production Elements
+    if (data.production_elements?.length > 0 || data.custom_production_elements?.length > 0) {
+      const elements = [...(data.production_elements || []), ...(data.custom_production_elements || [])];
+      if (elements.length > 0) {
+        parts.push(`Featuring ${elements.join(', ')}.`);
+      }
+    }
+    
+    // Artist Background
+    if (data.artist_background) {
+      parts.push(data.artist_background);
     }
     
     return parts.join(' ');
