@@ -109,7 +109,7 @@ export function PitchForm() {
       <div className="lg:sticky lg:top-6 h-fit">
         <PitchPreview 
           data={formValues} 
-          onRegenerate={generateAIPitch} 
+          onRegenerate={generateAIPitch}
           isGenerating={isGenerating}
         />
       </div>

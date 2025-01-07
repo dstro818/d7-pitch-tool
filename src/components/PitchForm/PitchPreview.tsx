@@ -9,13 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
-  onRegenerate?: (suggestions?: string) => void;
+  onRegenerate?: (data: PitchFormData, suggestions?: string) => void;
+  isGenerating?: boolean;
 }
 
-export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
+export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewProps) {
   const { toast } = useToast();
   const [suggestions, setSuggestions] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [hasGeneratedPitch, setHasGeneratedPitch] = useState(false);
 
   const formatPitchText = () => {
@@ -99,10 +99,9 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   };
 
   const handleRegenerate = async () => {
-    if (onRegenerate) {
-      setIsGenerating(true);
+    if (onRegenerate && data as PitchFormData) {
       try {
-        await onRegenerate(suggestions);
+        await onRegenerate(data as PitchFormData, suggestions);
         setHasGeneratedPitch(true);
       } catch (error) {
         console.error('Error regenerating pitch:', error);
@@ -111,20 +110,22 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           description: "Failed to regenerate pitch. Please try again.",
           variant: "destructive",
         });
-      } finally {
-        setIsGenerating(false);
       }
     }
   };
 
   const handleSendSuggestions = async () => {
-    if (onRegenerate && suggestions.trim()) {
-      setIsGenerating(true);
+    if (onRegenerate && suggestions.trim() && data as PitchFormData) {
       try {
-        await onRegenerate(suggestions);
+        await onRegenerate(data as PitchFormData, suggestions);
         setSuggestions(""); // Clear suggestions after sending
-      } finally {
-        setIsGenerating(false);
+      } catch (error) {
+        console.error('Error sending suggestions:', error);
+        toast({
+          title: "Error",
+          description: "Failed to send suggestions. Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
