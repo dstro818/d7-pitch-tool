@@ -18,10 +18,10 @@ export function PitchForm() {
       genres: [],
       theme: "",
       lyrics: "",
-      productionElements: [],
-      customProductionElements: [],
-      artistBackground: "",
-      targetPlaylist: "",
+      production_elements: [],
+      custom_production_elements: [],
+      artist_background: "",
+      target_playlist: "",
     },
   });
 
@@ -32,7 +32,7 @@ export function PitchForm() {
       const prompt = `Create a compelling pitch for a song titled "${formValues.title}" by ${formValues.artists || 'unknown artist'}. 
         Current theme: ${formValues.theme || 'none'}
         Current genres: ${formValues.genres.join(', ') || 'none'}
-        Current production elements: ${[...formValues.productionElements, ...formValues.customProductionElements].join(', ') || 'none'}
+        Current production elements: ${[...formValues.production_elements, ...formValues.custom_production_elements].join(', ') || 'none'}
         Please suggest improvements to make this pitch more engaging.`;
 
       const { data, error } = await supabase.functions.invoke('generate-pitch', {
@@ -63,7 +63,15 @@ export function PitchForm() {
       const { error } = await supabase
         .from('pitches')
         .insert([{
-          ...data,
+          title: data.title,
+          artists: data.artists,
+          genres: data.genres,
+          theme: data.theme,
+          lyrics: data.lyrics,
+          production_elements: data.production_elements,
+          custom_production_elements: data.custom_production_elements,
+          artist_background: data.artist_background,
+          target_playlist: data.target_playlist,
           user_id: (await supabase.auth.getUser()).data.user?.id
         }]);
 

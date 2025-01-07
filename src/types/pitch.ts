@@ -10,8 +10,8 @@ export interface PitchFormData {
   genres: Genre[];
   theme: string;
   lyrics: string;
-  productionElements: ProductionElement[];
-  customProductionElements: string[];
-  artistBackground: string;
-  targetPlaylist: string;
+  production_elements: ProductionElement[];
+  custom_production_elements: string[];
+  artist_background: string;
+  target_playlist: string;
 }
