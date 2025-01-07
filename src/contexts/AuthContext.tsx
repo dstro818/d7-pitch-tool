@@ -1,35 +1,34 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface AuthContextType {
+type AuthContextType = {
   isAuthenticated: boolean;
-  login: (password: string) => boolean;
+  login: () => void;
   logout: () => void;
-}
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Default to true for development
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // In development, always set as authenticated
+    // Always authenticated in development
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
   }, []);
 
-  const login = (password: string) => {
-    // In development, always return true
+  const login = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
-    return true;
+    navigate('/pitch');
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');
-    navigate('/');
+    navigate('/login');
   };
 
   return (
