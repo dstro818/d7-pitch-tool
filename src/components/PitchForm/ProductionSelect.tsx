@@ -1,5 +1,6 @@
 import React from "react";
-import { ProductionElement, PRODUCTION_ELEMENTS } from "@/types/pitch";
+import { ProductionElement } from "@/types/pitch";
+import { PRODUCTION_ELEMENTS } from "@/constants/pitch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";

@@ -1,5 +1,6 @@
 import React from "react";
-import { Genre, GENRES } from "@/types/pitch";
+import { Genre } from "@/types/pitch";
+import { GENRES } from "@/constants/pitch";
 import {
   FormControl,
   FormField,

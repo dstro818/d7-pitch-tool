@@ -1,5 +1,4 @@
-import { GENRES } from '@/components/PitchForm/GenreSelect';
-import { PRODUCTION_ELEMENTS } from '@/components/PitchForm/ProductionSelect';
+import { GENRES, PRODUCTION_ELEMENTS } from '@/constants/pitch';
 
 export type Genre = typeof GENRES[number];
 export type ProductionElement = typeof PRODUCTION_ELEMENTS[number];
