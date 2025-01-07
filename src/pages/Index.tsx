@@ -27,7 +27,7 @@ const Index = () => {
           </p>
           <Link to="/login">
             <Button size="lg" className="neon-border hover-glow">
-              Start Pitching for $1
+              Start Pitching Now
               <ArrowRight className="ml-2" />
             </Button>
           </Link>
