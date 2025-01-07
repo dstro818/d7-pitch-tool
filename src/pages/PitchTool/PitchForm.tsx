@@ -42,10 +42,9 @@ export function PitchForm() {
       if (error) throw error;
 
       if (response.suggestion) {
-        form.setValue('theme', response.suggestion);
         toast({
-          title: "Pitch Enhanced",
-          description: "AI suggestions have been applied to your pitch.",
+          title: "AI Suggestions Generated",
+          description: "Review the suggestions and update your pitch as needed.",
         });
       }
     } catch (error) {
@@ -64,7 +63,6 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
-      // Get the current user's session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) throw sessionError;
@@ -72,10 +70,6 @@ export function PitchForm() {
         throw new Error('No authenticated user found');
       }
 
-      // First generate AI suggestions
-      await generateAIPitch(data);
-
-      // Then save the pitch with the updated theme
       const { error } = await supabase
         .from('pitches')
         .insert({

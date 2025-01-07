@@ -53,7 +53,8 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       parts.push(data.artist_background);
     }
     
-    return parts.join(' ');
+    const text = parts.join(' ');
+    return text.slice(0, 500); // Enforce 500 character limit
   };
 
   const pitchText = formatPitchText();
@@ -62,15 +63,6 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const showPreview = characterCount > 0;
 
   const handleCopy = async () => {
-    if (isOverLimit) {
-      toast({
-        title: "Error",
-        description: "Pitch exceeds 500 characters. Please shorten it before copying.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       await navigator.clipboard.writeText(pitchText);
       toast({
@@ -87,15 +79,6 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   };
 
   const handleExport = () => {
-    if (isOverLimit) {
-      toast({
-        title: "Error",
-        description: "Pitch exceeds 500 characters. Please shorten it before exporting.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const element = document.createElement("a");
     const file = new Blob([pitchText], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
@@ -133,11 +116,9 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           {showPreview ? (
             <>
               {pitchText}
-              {characterCount > 0 && (
-                <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {characterCount}/500 characters
-                </div>
-              )}
+              <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
+                {characterCount}/500 characters
+              </div>
             </>
           ) : (
             <span className="text-muted-foreground/50 italic">
@@ -161,7 +142,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleCopy}
           className="flex items-center gap-2"
-          disabled={isOverLimit || !showPreview}
+          disabled={!showPreview}
         >
           <Copy className="h-4 w-4" />
           Copy
@@ -171,7 +152,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleExport}
           className="flex items-center gap-2"
-          disabled={isOverLimit || !showPreview}
+          disabled={!showPreview}
         >
           <Download className="h-4 w-4" />
           Export
