@@ -54,7 +54,6 @@ export function ProductionSelect({
     } else {
       onChange([...newValue, currentValue], customElements);
     }
-    setSearchValue("");
   };
 
   const handleAddCustom = () => {
@@ -90,7 +89,7 @@ export function ProductionSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between form-input-gradient text-foreground bg-background hover:bg-accent/50"
+          className="w-full justify-between form-input-gradient text-foreground bg-popover hover:bg-accent/50"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -154,7 +153,10 @@ export function ProductionSelect({
               <CommandItem
                 key={element}
                 value={element}
-                onSelect={() => handleSelect(element)}
+                onSelect={() => {
+                  handleSelect(element);
+                  setSearchValue("");
+                }}
                 className={cn(
                   "cursor-pointer text-foreground hover:bg-accent",
                   value.includes(element) && "opacity-50"

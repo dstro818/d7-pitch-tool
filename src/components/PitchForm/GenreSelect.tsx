@@ -53,7 +53,6 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
     } else if (newValue.length < 3) {
       onChange([...newValue, currentValue]);
     }
-    setSearchValue("");
   };
 
   const removeGenre = (genreToRemove: Genre, e: React.MouseEvent) => {
@@ -69,7 +68,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between form-input-gradient text-foreground bg-background hover:bg-accent/50"
+          className="w-full justify-between form-input-gradient text-foreground bg-popover hover:bg-accent/50"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -120,7 +119,10 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
               <CommandItem
                 key={genre}
                 value={genre}
-                onSelect={() => handleSelect(genre)}
+                onSelect={() => {
+                  handleSelect(genre);
+                  setSearchValue("");
+                }}
                 className={cn(
                   "cursor-pointer text-foreground hover:bg-accent",
                   value.includes(genre) && "opacity-50"
