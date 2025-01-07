@@ -104,6 +104,13 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       try {
         await onRegenerate(suggestions);
         setHasGeneratedPitch(true);
+      } catch (error) {
+        console.error('Error regenerating pitch:', error);
+        toast({
+          title: "Error",
+          description: "Failed to regenerate pitch. Please try again.",
+          variant: "destructive",
+        });
       } finally {
         setIsGenerating(false);
       }

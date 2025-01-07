@@ -14,22 +14,10 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export function PitchForm() {
   const { toast } = useToast();
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId] = useState('development-user'); // Fixed development user ID
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        setUserId(session.user.id);
-      } else if (!isAuthenticated) {
-        navigate('/login');
-      }
-    };
-    getUserId();
-  }, [isAuthenticated, navigate]);
-
   const form = useForm<PitchFormData>({
     defaultValues: {
       title: "",
@@ -47,16 +35,6 @@ export function PitchForm() {
   const formValues = form.watch();
 
   const generateAIPitch = async (data: PitchFormData, suggestions?: string) => {
-    if (!userId) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to generate pitches.",
-        variant: "destructive",
-      });
-      navigate('/login');
-      return;
-    }
-
     try {
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
         body: { ...data, user_id: userId, suggestions }
@@ -64,11 +42,11 @@ export function PitchForm() {
 
       if (error) throw error;
 
-      if (response.suggestion) {
+      if (response?.suggestion) {
         form.setValue('theme', response.suggestion);
         toast({
           title: "AI Pitch Generated",
-          description: "Your pitch has been generated and saved.",
+          description: "Your pitch has been generated successfully.",
         });
       }
     } catch (error) {
@@ -81,21 +59,7 @@ export function PitchForm() {
     }
   };
 
-  const handleRegenerate = (suggestions?: string) => {
-    generateAIPitch(formValues, suggestions);
-  };
-
   const onSubmit = async (data: PitchFormData) => {
-    if (!userId) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to save pitches.",
-        variant: "destructive",
-      });
-      navigate('/login');
-      return;
-    }
-
     try {
       const { error } = await supabase
         .from('pitches')
