@@ -27,17 +27,11 @@ export function ContentFields({ control }: ContentFieldsProps) {
               <FormLabel className="text-foreground">Song Theme</FormLabel>
             </div>
             <FormControl>
-              <div className="relative">
-                <Textarea
-                  className="glass-card border-white/10 text-foreground min-h-[100px]"
-                  placeholder="Write a description of your song's theme or story."
-                  maxLength={500}
-                  {...field}
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  {field.value?.length || 0}/500
-                </div>
-              </div>
+              <Textarea
+                className="glass-card border-white/10 text-foreground min-h-[100px]"
+                placeholder="Write a description of your song's theme or story."
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -54,17 +48,11 @@ export function ContentFields({ control }: ContentFieldsProps) {
               <FormLabel className="text-foreground">Notable Lyrics</FormLabel>
             </div>
             <FormControl>
-              <div className="relative">
-                <Textarea
-                  className="glass-card border-white/10 text-foreground min-h-[100px]"
-                  placeholder="Enter notable lyrics that capture the essence of the song"
-                  maxLength={500}
-                  {...field}
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  {field.value?.length || 0}/500
-                </div>
-              </div>
+              <Textarea
+                className="glass-card border-white/10 text-foreground min-h-[100px]"
+                placeholder="Enter notable lyrics that capture the essence of the song"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
