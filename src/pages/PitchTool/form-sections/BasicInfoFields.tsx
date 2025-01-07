@@ -63,13 +63,13 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
       <FormField
         control={control}
         name="genres"
-        render={({ field }) => (
+        render={({ field: { onChange, value } }) => (
           <FormItem>
             <FormLabel className="text-foreground">Genres (up to 3)</FormLabel>
             <FormControl>
               <GenreSelect
-                value={field.value}
-                onChange={field.onChange}
+                value={value}
+                onChange={onChange}
               />
             </FormControl>
             <FormMessage />
