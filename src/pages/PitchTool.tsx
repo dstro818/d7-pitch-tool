@@ -66,23 +66,12 @@ const PitchTool = () => {
     }
   };
 
-  const formFields = form.watch();
-  const filledFieldsCount = Object.values(formFields).filter(
-    (value) => 
-      (Array.isArray(value) && value.length > 0) || 
-      (typeof value === "string" && value.trim() !== "")
-  ).length;
-
-  if (filledFieldsCount >= 5 && !isSubmitting) {
-    form.handleSubmit(onSubmit)();
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-background">
+      <nav className="glass-card border-b border-white/10">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">DSTRO7 Pitch Tool</h1>
-          <Button variant="ghost" onClick={logout}>
+          <h1 className="text-2xl font-bold text-foreground">DSTRO7 Pitch Tool</h1>
+          <Button variant="ghost" onClick={logout} className="hover-glow">
             Logout
           </Button>
         </div>
@@ -102,11 +91,15 @@ const PitchTool = () => {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Song Title</FormLabel>
+                      <FormLabel className="text-foreground">Song Title</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Music className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input className="pl-9" placeholder="Enter song title" {...field} />
+                          <Music className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            className="pl-9 glass-card border-white/10 text-foreground" 
+                            placeholder="Enter song title" 
+                            {...field} 
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -119,11 +112,15 @@ const PitchTool = () => {
                   name="artists"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Featured Artists</FormLabel>
+                      <FormLabel className="text-foreground">Featured Artists</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input className="pl-9" placeholder="Enter featured artists" {...field} />
+                          <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            className="pl-9 glass-card border-white/10 text-foreground" 
+                            placeholder="Enter featured artists" 
+                            {...field} 
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -136,7 +133,7 @@ const PitchTool = () => {
                   name="genres"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Genres (up to 3)</FormLabel>
+                      <FormLabel className="text-foreground">Genres (up to 3)</FormLabel>
                       <FormControl>
                         <GenreSelect
                           value={field.value}
@@ -153,11 +150,15 @@ const PitchTool = () => {
                   name="targetPlaylist"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Target Playlist</FormLabel>
+                      <FormLabel className="text-foreground">Target Playlist</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <ListMusic className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input className="pl-9" placeholder="Enter target playlist" {...field} />
+                          <ListMusic className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            className="pl-9 glass-card border-white/10 text-foreground" 
+                            placeholder="Enter target playlist" 
+                            {...field} 
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -172,12 +173,12 @@ const PitchTool = () => {
                   name="theme"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Song Theme/Story</FormLabel>
+                      <FormLabel className="text-foreground">Song Theme/Story</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Textarea
-                            className="pl-9 min-h-[100px]"
+                            className="pl-9 glass-card border-white/10 text-foreground min-h-[100px]"
                             placeholder="Describe the theme or story behind your song"
                             {...field}
                           />
@@ -193,12 +194,12 @@ const PitchTool = () => {
                   name="lyrics"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notable Lyrics</FormLabel>
+                      <FormLabel className="text-foreground">Notable Lyrics</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Quote className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Quote className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Textarea
-                            className="pl-9 min-h-[100px]"
+                            className="pl-9 glass-card border-white/10 text-foreground min-h-[100px]"
                             placeholder="Share some notable lyrics from your song"
                             {...field}
                           />
@@ -214,7 +215,7 @@ const PitchTool = () => {
                   name="productionElements"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Production Details</FormLabel>
+                      <FormLabel className="text-foreground">Production Details</FormLabel>
                       <FormControl>
                         <ProductionSelect
                           value={field.value}
@@ -235,12 +236,12 @@ const PitchTool = () => {
                   name="artistBackground"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Artist Background</FormLabel>
+                      <FormLabel className="text-foreground">Artist Background</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Textarea
-                            className="pl-9 min-h-[100px]"
+                            className="pl-9 glass-card border-white/10 text-foreground min-h-[100px]"
                             placeholder="Tell us about your background as an artist"
                             {...field}
                           />
@@ -254,7 +255,7 @@ const PitchTool = () => {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full neon-border hover-glow"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Creating Pitch..." : "Create Pitch"}
