@@ -1,6 +1,7 @@
 import { GENRES, PRODUCTION_ELEMENTS } from '@/constants/pitch';
 
-export type Genre = typeof GENRES[number];
+export type PredefinedGenre = typeof GENRES[number];
+export type Genre = PredefinedGenre | string;
 export type ProductionElement = typeof PRODUCTION_ELEMENTS[number];
 
 export interface PitchFormData {

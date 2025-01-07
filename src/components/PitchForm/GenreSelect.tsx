@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Genre } from "@/types/pitch";
+import { Genre, PredefinedGenre } from "@/types/pitch";
 import { GENRES } from "@/constants/pitch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -15,13 +15,13 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleGenreRemove = (genre: Genre | string) => {
-    onChange(value.filter((g) => g !== genre) as Genre[]);
+  const handleGenreRemove = (genre: Genre) => {
+    onChange(value.filter((g) => g !== genre));
   };
 
-  const handleGenreAdd = (genre: Genre | string) => {
+  const handleGenreAdd = (genre: PredefinedGenre | string) => {
     if (value.length < 3 && !value.includes(genre)) {
-      onChange([...value, genre] as Genre[]);
+      onChange([...value, genre]);
       setSearchTerm("");
       setIsDropdownOpen(false);
     }
@@ -37,7 +37,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
     !GENRES.some(genre => 
       genre.toLowerCase() === searchTerm.toLowerCase()
     ) &&
-    !value.includes(searchTerm.trim() as Genre);
+    !value.includes(searchTerm.trim());
 
   return (
     <div className="space-y-2">
