@@ -10,23 +10,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Default to true for development
   const navigate = useNavigate();
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-    }
+    // In development, always set as authenticated
+    setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
   }, []);
 
   const login = (password: string) => {
-    if (password === 'pass123!') {
-      setIsAuthenticated(true);
-      localStorage.setItem('isAuthenticated', 'true');
-      return true;
-    }
-    return false;
+    // In development, always return true
+    setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
+    return true;
   };
 
   const logout = () => {
