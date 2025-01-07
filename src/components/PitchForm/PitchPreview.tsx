@@ -5,6 +5,7 @@ import { Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PitchSuggestions } from "./PitchSuggestions";
 import { PitchActions } from "./PitchActions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
@@ -15,6 +16,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const { toast } = useToast();
   const [suggestions, setSuggestions] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasGeneratedPitch, setHasGeneratedPitch] = useState(false);
 
   const formatPitchText = () => {
     const parts = [];
@@ -101,6 +103,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       setIsGenerating(true);
       try {
         await onRegenerate(suggestions);
+        setHasGeneratedPitch(true);
       } finally {
         setIsGenerating(false);
       }
@@ -128,21 +131,29 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-muted-foreground">
-          {showPreview ? (
-            <>
-              {pitchText}
-              <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
-                {characterCount}/500 characters
-              </div>
-            </>
-          ) : (
-            <span className="text-muted-foreground/50 italic">
-              Start typing to see your pitch preview...
-            </span>
-          )}
-        </div>
-        {showPreview && (
+        {isGenerating ? (
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        ) : (
+          <div className="text-muted-foreground">
+            {showPreview ? (
+              <>
+                {pitchText}
+                <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  {characterCount}/500 characters
+                </div>
+              </>
+            ) : (
+              <span className="text-muted-foreground/50 italic">
+                Start typing to see your pitch preview...
+              </span>
+            )}
+          </div>
+        )}
+        {showPreview && hasGeneratedPitch && !isGenerating && (
           <PitchSuggestions
             value={suggestions}
             onChange={setSuggestions}
