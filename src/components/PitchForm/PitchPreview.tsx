@@ -1,34 +1,66 @@
 import React from "react";
 import { PitchFormData } from "@/types/pitch";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Music, Quote } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Music, Quote, Copy, Download, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
 }
 
 export function PitchPreview({ data }: PitchPreviewProps) {
+  const { toast } = useToast();
+
   const formatPitchText = () => {
     const parts = [];
     
-    // Add genres in brackets if they exist
     if (data.genres && data.genres.length > 0) {
       parts.push(`[${data.genres.join(', ')}]`);
     }
     
-    // Add title and artists
     parts.push(data.title || "Untitled Track");
     if (data.artists) {
       parts.push(`ft. ${data.artists}`);
     }
     
-    // Add theme after a period
     if (data.theme) {
       parts.push(data.theme);
     }
     
     return parts.join(' ');
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(formatPitchText());
+      toast({
+        title: "Copied!",
+        description: "Pitch text copied to clipboard",
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to copy text",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExport = () => {
+    const element = document.createElement("a");
+    const file = new Blob([formatPitchText()], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = "pitch.txt";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    
+    toast({
+      title: "Exported!",
+      description: "Pitch exported as text file",
+    });
   };
 
   return (
@@ -63,6 +95,26 @@ export function PitchPreview({ data }: PitchPreviewProps) {
           </div>
         )}
       </CardContent>
+      <CardFooter className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopy}
+          className="flex items-center gap-2"
+        >
+          <Copy className="h-4 w-4" />
+          Copy
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExport}
+          className="flex items-center gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Export
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
