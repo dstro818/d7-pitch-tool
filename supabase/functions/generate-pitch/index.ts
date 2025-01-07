@@ -1,62 +1,69 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt } = await req.json()
+    const { prompt } = await req.json();
 
-    // Initialize OpenAI
-    const configuration = new Configuration({
-      apiKey: Deno.env.get('OPENAI_API_KEY'),
-    })
-    const openai = new OpenAIApi(configuration)
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
 
-    // Format the prompt to generate a structured pitch
-    const formattedPrompt = `
-      Create a concise music pitch (max 500 characters) following this structure:
-      1. Start with the title and artists (if applicable)
-      2. Describe the song's theme and emotional impact
-      3. Mention notable production elements or musical style
-      4. Include any relevant background or context
-      5. End with why this track stands out
+    console.log('Generating pitch with prompt:', prompt);
 
-      Original input: ${prompt}
-      
-      Remember to keep the total response under 500 characters while maintaining engaging and informative content.
-    `
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a music industry expert helping to create compelling song pitches. Keep your responses concise and focused on making the pitch more engaging.'
+          },
+          { role: 'user', content: prompt }
+        ],
+      }),
+    });
 
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: formattedPrompt }],
-      max_tokens: 200,
-      temperature: 0.7,
-    })
+    const data = await response.json();
+    console.log('OpenAI response:', data);
 
-    const suggestion = completion.data.choices[0]?.message?.content || ''
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    }
 
+    const suggestion = data.choices[0].message.content;
+    
     return new Response(
       JSON.stringify({ suggestion }),
-      {
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
-    )
+    );
   } catch (error) {
+    console.error('Error in generate-pitch function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      { 
         status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
-    )
+    );
   }
-})
+});
