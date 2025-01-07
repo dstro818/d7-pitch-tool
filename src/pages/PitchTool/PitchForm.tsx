@@ -60,20 +60,21 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
+      // Get the current user's session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) throw sessionError;
+      if (!session?.user?.id) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Insert the pitch with the user_id
       const { error } = await supabase
         .from('pitches')
-        .insert([{
-          title: data.title,
-          artists: data.artists,
-          genres: data.genres,
-          theme: data.theme,
-          lyrics: data.lyrics,
-          production_elements: data.production_elements,
-          custom_production_elements: data.custom_production_elements,
-          artist_background: data.artist_background,
-          target_playlist: data.target_playlist,
-          user_id: (await supabase.auth.getUser()).data.user?.id
-        }]);
+        .insert({
+          ...data,
+          user_id: session.user.id
+        });
 
       if (error) throw error;
 
