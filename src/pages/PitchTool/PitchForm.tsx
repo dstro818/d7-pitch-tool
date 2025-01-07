@@ -29,29 +29,24 @@ export function PitchForm() {
 
   const generateAIPitch = async (data: PitchFormData) => {
     try {
-      const prompt = `Create a compelling pitch for a song titled "${data.title}" by ${data.artists || 'unknown artist'}. 
-        Current theme: ${data.theme || 'none'}
-        Current genres: ${data.genres.join(', ') || 'none'}
-        Current production elements: ${[...data.production_elements, ...data.custom_production_elements].join(', ') || 'none'}
-        Please suggest improvements to make this pitch more engaging.`;
-
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
-        body: { prompt }
+        body: data
       });
 
       if (error) throw error;
 
       if (response.suggestion) {
+        form.setValue('theme', response.suggestion);
         toast({
-          title: "AI Suggestions Generated",
-          description: "Review the suggestions and update your pitch as needed.",
+          title: "AI Pitch Generated",
+          description: "Your pitch has been generated and saved.",
         });
       }
     } catch (error) {
       console.error('Error generating pitch:', error);
       toast({
         title: "Error",
-        description: "Failed to generate suggestions. Please try again.",
+        description: "Failed to generate pitch. Please try again.",
         variant: "destructive",
       });
     }
@@ -70,6 +65,10 @@ export function PitchForm() {
         throw new Error('No authenticated user found');
       }
 
+      // First generate AI pitch
+      await generateAIPitch(data);
+
+      // Then save to database
       const { error } = await supabase
         .from('pitches')
         .insert({

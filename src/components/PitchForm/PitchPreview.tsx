@@ -25,9 +25,9 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       }
     }
     
-    // Genre Section
+    // Genre Section - without brackets
     if (data.genres && data.genres.length > 0) {
-      parts.push(`[${data.genres.join(', ')}]`);
+      parts.push(data.genres.join(', '));
     }
     
     // Main Description
