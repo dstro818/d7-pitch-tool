@@ -9,26 +9,32 @@ interface PitchPreviewProps {
 }
 
 export function PitchPreview({ data }: PitchPreviewProps) {
-  const genresText = data.genres && data.genres.length > 0 
-    ? `[${data.genres.join(', ')}]` 
-    : '';
+  const formatPitchText = () => {
+    if (!data.theme) return '';
+    
+    const genreText = data.genres && data.genres.length > 0 
+      ? `[${data.genres.join(', ')}] `
+      : '';
+
+    const artistText = data.artists 
+      ? ` ft. ${data.artists}`
+      : '';
+
+    return `${genreText}${data.title || "Untitled Track"}${artistText}. ${data.theme}`;
+  };
 
   return (
     <Card className="w-full glass-card border-white/10">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Music className="h-5 w-5" />
-          {data.title || "Untitled Track"}
-          {data.artists && <span className="text-muted-foreground">ft. {data.artists}</span>}
+          Pitch Preview
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {data.theme && (
-          <div className="text-muted-foreground whitespace-pre-wrap">
-            {genresText && <span className="font-medium">{genresText} </span>}
-            {data.theme}
-          </div>
-        )}
+        <div className="text-muted-foreground whitespace-pre-wrap">
+          {formatPitchText()}
+        </div>
 
         {data.lyrics && (
           <div className="flex items-start gap-2">
