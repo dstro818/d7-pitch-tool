@@ -1,4 +1,4 @@
-import { Check, Music2 } from "lucide-react";
+import { Check, Music2, Plus, X } from "lucide-react";
 import { ProductionElement, PRODUCTION_ELEMENTS } from "@/types/pitch";
 import {
   Command,
@@ -43,12 +43,29 @@ export const ProductionSelect = ({
     }
   };
 
+  const removeElement = (element: ProductionElement | string) => {
+    if (PRODUCTION_ELEMENTS.includes(element as ProductionElement)) {
+      onChange(
+        value.filter((v) => v !== element),
+        customElements
+      );
+    } else {
+      onChange(
+        value,
+        customElements.filter((e) => e !== element)
+      );
+    }
+  };
+
   const addCustomElement = () => {
     if (customInput.trim() && !customElements.includes(customInput.trim())) {
       onChange(value, [...customElements, customInput.trim()]);
       setCustomInput("");
+      setOpen(false);
     }
   };
+
+  const allElements = [...value, ...customElements];
 
   return (
     <div className="space-y-2">
@@ -63,11 +80,20 @@ export const ProductionSelect = ({
             <div className="flex gap-2 items-center">
               <Music2 className="h-4 w-4 shrink-0" />
               <span className="truncate">
-                {value.length === 0 && customElements.length === 0
+                {allElements.length === 0
                   ? "Select production elements..."
-                  : [...value, ...customElements].map((element) => (
-                      <Badge key={element} variant="secondary" className="mr-1">
+                  : allElements.map((element) => (
+                      <Badge
+                        key={element}
+                        variant="secondary"
+                        className="mr-1 cursor-pointer hover:bg-secondary/80"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeElement(element);
+                        }}
+                      >
                         {element}
+                        <X className="h-3 w-3 ml-1" />
                       </Badge>
                     ))}
               </span>
@@ -76,8 +102,30 @@ export const ProductionSelect = ({
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput placeholder="Search elements..." />
-            <CommandEmpty>No element found.</CommandEmpty>
+            <CommandInput placeholder="Search elements or add custom..." />
+            <CommandEmpty>
+              <div className="p-2">
+                <div className="text-sm text-muted-foreground mb-2">
+                  No element found. Add custom element:
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    placeholder="Enter custom element..."
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomElement();
+                      }
+                    }}
+                  />
+                  <Button size="sm" onClick={addCustomElement}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CommandEmpty>
             <CommandGroup className="max-h-64 overflow-auto">
               {PRODUCTION_ELEMENTS.map((element) => (
                 <CommandItem
@@ -98,22 +146,6 @@ export const ProductionSelect = ({
           </Command>
         </PopoverContent>
       </Popover>
-      <div className="flex gap-2">
-        <Input
-          placeholder="Add custom element..."
-          value={customInput}
-          onChange={(e) => setCustomInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              addCustomElement();
-            }
-          }}
-        />
-        <Button type="button" onClick={addCustomElement}>
-          Add
-        </Button>
-      </div>
     </div>
   );
 };
