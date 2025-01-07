@@ -1,17 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Genre } from "@/types/pitch";
 import { GENRES } from "@/constants/pitch";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Plus, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
 interface GenreSelectProps {
   value: Genre[];
@@ -19,21 +12,30 @@ interface GenreSelectProps {
 }
 
 export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
-  const handleGenreAdd = (genre: Genre) => {
-    if (value.length < 3 && !value.includes(genre)) {
-      onChange([...value, genre]);
-    }
-  };
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleGenreRemove = (genre: Genre) => {
     onChange(value.filter((g) => g !== genre));
   };
 
-  const availableGenres = GENRES.filter(genre => !value.includes(genre));
+  const handleGenreAdd = (genre: Genre) => {
+    if (value.length < 3 && !value.includes(genre)) {
+      onChange([...value, genre]);
+      setSearchTerm("");
+      setIsDropdownOpen(false);
+    }
+  };
+
+  const filteredGenres = GENRES.filter(
+    (genre) => 
+      !value.includes(genre) && 
+      genre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 mb-2">
         {value.map((genre) => (
           <Badge key={genre} variant="secondary" className="flex items-center gap-1">
             {genre}
@@ -47,24 +49,36 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
           </Badge>
         ))}
       </div>
-      
-      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-        <div className="grid grid-cols-2 gap-4">
-          {availableGenres.map((genre) => (
-            <Button
-              key={genre}
-              type="button"
-              variant="outline"
-              className="justify-start"
-              onClick={() => handleGenreAdd(genre)}
-              disabled={value.length >= 3}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {genre}
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
+
+      <div className="relative">
+        <Input
+          placeholder="Search genres..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setIsDropdownOpen(true);
+          }}
+          onFocus={() => setIsDropdownOpen(true)}
+        />
+
+        {isDropdownOpen && searchTerm && filteredGenres.length > 0 && (
+          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
+            <ScrollArea className="max-h-[200px]">
+              {filteredGenres.map((genre) => (
+                <button
+                  key={genre}
+                  type="button"
+                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors"
+                  onClick={() => handleGenreAdd(genre)}
+                  disabled={value.length >= 3}
+                >
+                  {genre}
+                </button>
+              ))}
+            </ScrollArea>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

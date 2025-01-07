@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ProductionElement } from "@/types/pitch";
 import { PRODUCTION_ELEMENTS } from "@/constants/pitch";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,11 +18,15 @@ export function ProductionSelect({
   customElements = [], 
   onChange 
 }: ProductionSelectProps) {
-  const [customInput, setCustomInput] = React.useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [customInput, setCustomInput] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleProductionAdd = (element: ProductionElement) => {
     if (!value.includes(element)) {
       onChange([...value, element], customElements);
+      setSearchTerm("");
+      setIsDropdownOpen(false);
     }
   };
 
@@ -41,7 +45,11 @@ export function ProductionSelect({
     onChange(value, customElements.filter((e) => e !== element));
   };
 
-  const availableElements = PRODUCTION_ELEMENTS.filter(element => !value.includes(element));
+  const filteredElements = PRODUCTION_ELEMENTS.filter(
+    (element) => 
+      !value.includes(element) && 
+      element.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-4">
@@ -72,6 +80,35 @@ export function ProductionSelect({
         ))}
       </div>
 
+      <div className="relative">
+        <Input
+          placeholder="Search production elements..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setIsDropdownOpen(true);
+          }}
+          onFocus={() => setIsDropdownOpen(true)}
+        />
+
+        {isDropdownOpen && searchTerm && filteredElements.length > 0 && (
+          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
+            <ScrollArea className="max-h-[200px]">
+              {filteredElements.map((element) => (
+                <button
+                  key={element}
+                  type="button"
+                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors"
+                  onClick={() => handleProductionAdd(element)}
+                >
+                  {element}
+                </button>
+              ))}
+            </ScrollArea>
+          </div>
+        )}
+      </div>
+
       <div className="flex gap-2">
         <Input
           placeholder="Add custom production element..."
@@ -88,23 +125,6 @@ export function ProductionSelect({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-
-      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-        <div className="grid grid-cols-2 gap-4">
-          {availableElements.map((element) => (
-            <Button
-              key={element}
-              type="button"
-              variant="outline"
-              className="justify-start"
-              onClick={() => handleProductionAdd(element)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {element}
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
     </div>
   );
 }
