@@ -27,22 +27,22 @@ export function PitchForm() {
 
   const formValues = form.watch();
 
-  const handleRegenerate = async () => {
+  const generateAIPitch = async (data: PitchFormData) => {
     try {
-      const prompt = `Create a compelling pitch for a song titled "${formValues.title}" by ${formValues.artists || 'unknown artist'}. 
-        Current theme: ${formValues.theme || 'none'}
-        Current genres: ${formValues.genres.join(', ') || 'none'}
-        Current production elements: ${[...formValues.production_elements, ...formValues.custom_production_elements].join(', ') || 'none'}
+      const prompt = `Create a compelling pitch for a song titled "${data.title}" by ${data.artists || 'unknown artist'}. 
+        Current theme: ${data.theme || 'none'}
+        Current genres: ${data.genres.join(', ') || 'none'}
+        Current production elements: ${[...data.production_elements, ...data.custom_production_elements].join(', ') || 'none'}
         Please suggest improvements to make this pitch more engaging.`;
 
-      const { data, error } = await supabase.functions.invoke('generate-pitch', {
+      const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
         body: { prompt }
       });
 
       if (error) throw error;
 
-      if (data.suggestion) {
-        form.setValue('theme', data.suggestion);
+      if (response.suggestion) {
+        form.setValue('theme', response.suggestion);
         toast({
           title: "Pitch Enhanced",
           description: "AI suggestions have been applied to your pitch.",
@@ -58,6 +58,10 @@ export function PitchForm() {
     }
   };
 
+  const handleRegenerate = () => {
+    generateAIPitch(formValues);
+  };
+
   const onSubmit = async (data: PitchFormData) => {
     try {
       // Get the current user's session
@@ -68,7 +72,10 @@ export function PitchForm() {
         throw new Error('No authenticated user found');
       }
 
-      // Insert the pitch with the user_id
+      // First generate AI suggestions
+      await generateAIPitch(data);
+
+      // Then save the pitch with the updated theme
       const { error } = await supabase
         .from('pitches')
         .insert({
