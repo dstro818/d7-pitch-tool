@@ -9,20 +9,26 @@ import { ProductionFields } from "./form-sections/ProductionFields";
 import { PitchPreview } from "@/components/PitchForm/PitchPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function PitchForm() {
   const { toast } = useToast();
   const [userId, setUserId] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const getUserId = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.id) {
         setUserId(session.user.id);
+      } else if (!isAuthenticated) {
+        navigate('/login');
       }
     };
     getUserId();
-  }, []);
+  }, [isAuthenticated, navigate]);
 
   const form = useForm<PitchFormData>({
     defaultValues: {
@@ -41,11 +47,17 @@ export function PitchForm() {
   const formValues = form.watch();
 
   const generateAIPitch = async (data: PitchFormData, suggestions?: string) => {
-    try {
-      if (!userId) {
-        throw new Error('No authenticated user found');
-      }
+    if (!userId) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to generate pitches.",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
 
+    try {
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
         body: { ...data, user_id: userId, suggestions }
       });
@@ -74,15 +86,17 @@ export function PitchForm() {
   };
 
   const onSubmit = async (data: PitchFormData) => {
+    if (!userId) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to save pitches.",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+
     try {
-      if (!userId) {
-        throw new Error('No authenticated user found');
-      }
-
-      // First generate AI pitch
-      await generateAIPitch(data);
-
-      // Then save to database
       const { error } = await supabase
         .from('pitches')
         .insert({
