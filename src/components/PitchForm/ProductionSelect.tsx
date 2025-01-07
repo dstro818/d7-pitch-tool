@@ -62,6 +62,7 @@ export function ProductionSelect({
     if (!searchValue.trim()) return;
     onChange(value, [...customElements, searchValue.trim()]);
     setSearchValue("");
+    setOpen(false);
   };
 
   const removeElement = (element: ProductionElement | string, e: React.MouseEvent) => {
@@ -90,7 +91,7 @@ export function ProductionSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between form-input-gradient text-foreground"
+          className="w-full justify-between form-input-gradient text-foreground bg-background"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -122,7 +123,12 @@ export function ProductionSelect({
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-background border shadow-md z-50">
+      <PopoverContent 
+        className="w-full p-0 bg-background border shadow-md" 
+        align="start"
+        side="bottom"
+        sideOffset={5}
+      >
         <Command className="bg-background">
           <CommandInput 
             placeholder="Search elements..." 

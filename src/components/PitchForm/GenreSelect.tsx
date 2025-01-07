@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Music, X, Plus, ChevronsUpDown } from "lucide-react";
+import { Music, X, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const GENRES = [
@@ -70,7 +70,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between form-input-gradient text-foreground"
+          className="w-full justify-between form-input-gradient text-foreground bg-background"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -102,7 +102,12 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-background border shadow-md z-50">
+      <PopoverContent 
+        className="w-full p-0 bg-background border shadow-md" 
+        align="start"
+        side="bottom"
+        sideOffset={5}
+      >
         <Command className="bg-background">
           <CommandInput 
             placeholder="Search genres..." 
