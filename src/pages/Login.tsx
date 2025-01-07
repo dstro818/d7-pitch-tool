@@ -25,9 +25,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6">Login to DSTRO7</h1>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="glass-card w-full max-w-md p-8 space-y-6">
+        <h1 className="text-2xl font-bold text-center text-foreground">Login to DSTRO7</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Input
@@ -35,10 +35,10 @@ const Login = () => {
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full"
+              className="w-full bg-black/40 text-white placeholder:text-gray-400 border-white/10"
             />
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full neon-border hover-glow">
             Login
           </Button>
         </form>
