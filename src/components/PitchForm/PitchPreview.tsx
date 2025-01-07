@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { PitchFormData } from "@/types/pitch";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Music, Copy, Download, RefreshCw } from "lucide-react";
+import { Music, Copy, Download, RefreshCw, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ interface PitchPreviewProps {
 export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const { toast } = useToast();
   const [suggestions, setSuggestions] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const formatPitchText = () => {
     const parts = [];
@@ -95,13 +96,26 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
     });
   };
 
-  const handleRegenerate = () => {
+  const handleRegenerate = async () => {
     if (onRegenerate) {
-      onRegenerate(suggestions);
-      toast({
-        title: "Regenerating",
-        description: "Generating new pitch suggestions...",
-      });
+      setIsGenerating(true);
+      try {
+        await onRegenerate(suggestions);
+      } finally {
+        setIsGenerating(false);
+      }
+    }
+  };
+
+  const handleSendSuggestions = async () => {
+    if (onRegenerate && suggestions.trim()) {
+      setIsGenerating(true);
+      try {
+        await onRegenerate(suggestions);
+        setSuggestions(""); // Clear suggestions after sending
+      } finally {
+        setIsGenerating(false);
+      }
     }
   };
 
@@ -132,12 +146,23 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           <label className="text-sm text-muted-foreground">
             Suggestions for AI (optional)
           </label>
-          <Textarea
-            value={suggestions}
-            onChange={(e) => setSuggestions(e.target.value)}
-            placeholder="Add any specific suggestions for the AI to consider when generating the pitch..."
-            className="min-h-[100px]"
-          />
+          <div className="flex gap-2">
+            <Textarea
+              value={suggestions}
+              onChange={(e) => setSuggestions(e.target.value)}
+              placeholder="Add any specific suggestions for the AI to consider when generating the pitch..."
+              className="min-h-[100px]"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleSendSuggestions}
+              disabled={!suggestions.trim() || isGenerating}
+              className="self-start"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="flex gap-2">
@@ -146,9 +171,10 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleRegenerate}
           className="flex items-center gap-2"
+          disabled={isGenerating}
         >
-          <RefreshCw className="h-4 w-4" />
-          Regenerate
+          <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
+          {isGenerating ? 'Generating...' : 'Regenerate'}
         </Button>
         <Button
           variant="outline"

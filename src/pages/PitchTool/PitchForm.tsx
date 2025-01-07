@@ -36,7 +36,7 @@ export function PitchForm() {
       if (error) throw error;
 
       if (response.suggestion) {
-        form.setValue('theme', response.suggestion);
+        // Remove setting the theme field here
         toast({
           title: "AI Pitch Generated",
           description: "Your pitch has been generated and saved.",
