@@ -1,8 +1,7 @@
 import React from "react";
 import { PitchFormData } from "@/types/pitch";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Music, Quote, Copy, Download, RefreshCw } from "lucide-react";
+import { Music, Copy, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,7 +25,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       }
     }
     
-    // Genre and Theme Section
+    // Genre Section
     if (data.genres && data.genres.length > 0) {
       parts.push(`[${data.genres.join(', ')}]`);
     }
@@ -42,6 +41,11 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       if (elements.length > 0) {
         parts.push(`Featuring ${elements.join(', ')}.`);
       }
+    }
+    
+    // Notable Lyrics
+    if (data.lyrics) {
+      parts.push(`Notable lyrics: "${data.lyrics}"`);
     }
     
     // Artist Background
@@ -141,25 +145,6 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
             </span>
           )}
         </div>
-
-        {data.lyrics && (
-          <div className="flex items-start gap-2">
-            <Quote className="h-4 w-4 mt-1 shrink-0" />
-            <div className="text-muted-foreground italic">
-              "{data.lyrics}"
-            </div>
-          </div>
-        )}
-
-        {(data.production_elements?.length > 0 || data.custom_production_elements?.length > 0) && (
-          <div className="flex flex-wrap gap-1">
-            {[...(data.production_elements || []), ...(data.custom_production_elements || [])].map((element) => (
-              <Badge key={element} variant="secondary">
-                {element}
-              </Badge>
-            ))}
-          </div>
-        )}
       </CardContent>
       <CardFooter className="flex gap-2">
         <Button
