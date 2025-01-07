@@ -58,9 +58,12 @@ export function ProductionSelect({
 
   const handleAddCustom = () => {
     if (!searchValue.trim()) return;
-    onChange(value, [...customElements, searchValue.trim()]);
-    setSearchValue("");
-    setOpen(false);
+    const newCustomElement = searchValue.trim();
+    if (!customElements.includes(newCustomElement)) {
+      onChange(value, [...customElements, newCustomElement]);
+      setSearchValue("");
+      setOpen(false);
+    }
   };
 
   const removeElement = (element: ProductionElement | string, e: React.MouseEvent) => {
@@ -126,7 +129,6 @@ export function ProductionSelect({
         align="start"
         side="bottom"
         sideOffset={5}
-        style={{ zIndex: 50 }}
       >
         <Command className="bg-popover border rounded-lg shadow-md">
           <CommandInput 
@@ -155,7 +157,6 @@ export function ProductionSelect({
                 value={element}
                 onSelect={() => {
                   handleSelect(element);
-                  setSearchValue("");
                 }}
                 className={cn(
                   "cursor-pointer text-foreground hover:bg-accent",

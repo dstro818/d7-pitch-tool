@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Music, X, ChevronsUpDown } from "lucide-react";
+import { Music, X, Plus, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const GENRES = [
@@ -52,6 +52,16 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
       onChange(newValue.filter((v) => v !== currentValue));
     } else if (newValue.length < 3) {
       onChange([...newValue, currentValue]);
+    }
+  };
+
+  const handleAddCustom = () => {
+    if (!searchValue.trim() || value.length >= 3) return;
+    const customGenre = searchValue.trim() as Genre;
+    if (!GENRES.includes(customGenre) && !value.includes(customGenre)) {
+      onChange([...value, customGenre]);
+      setSearchValue("");
+      setOpen(false);
     }
   };
 
@@ -105,7 +115,6 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
         align="start"
         side="bottom"
         sideOffset={5}
-        style={{ zIndex: 50 }}
       >
         <Command className="bg-popover border rounded-lg shadow-md">
           <CommandInput 
@@ -114,6 +123,19 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
             onValueChange={setSearchValue}
             className="text-foreground"
           />
+          <CommandEmpty className="text-foreground p-2">
+            {searchValue && (
+              <Button
+                onClick={handleAddCustom}
+                className="w-full justify-start"
+                variant="ghost"
+                type="button"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add "{searchValue}"
+              </Button>
+            )}
+          </CommandEmpty>
           <CommandGroup className="max-h-[200px] overflow-y-auto">
             {filteredGenres.map((genre) => (
               <CommandItem
@@ -121,7 +143,6 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
                 value={genre}
                 onSelect={() => {
                   handleSelect(genre);
-                  setSearchValue("");
                 }}
                 className={cn(
                   "cursor-pointer text-foreground hover:bg-accent",
