@@ -1,11 +1,11 @@
 import React from "react";
 import { ProductionElement } from "@/types/pitch";
 import { PRODUCTION_ELEMENTS } from "@/constants/pitch";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, X } from "lucide-react";
 
 interface ProductionSelectProps {
   value: ProductionElement[];
@@ -20,12 +20,14 @@ export function ProductionSelect({
 }: ProductionSelectProps) {
   const [customInput, setCustomInput] = React.useState("");
 
-  const handleProductionChange = (element: ProductionElement, checked: boolean) => {
-    if (checked) {
+  const handleProductionAdd = (element: ProductionElement) => {
+    if (!value.includes(element)) {
       onChange([...value, element], customElements);
-    } else {
-      onChange(value.filter((e) => e !== element), customElements);
     }
+  };
+
+  const handleProductionRemove = (element: ProductionElement) => {
+    onChange(value.filter((e) => e !== element), customElements);
   };
 
   const handleAddCustom = () => {
@@ -39,8 +41,37 @@ export function ProductionSelect({
     onChange(value, customElements.filter((e) => e !== element));
   };
 
+  const availableElements = PRODUCTION_ELEMENTS.filter(element => !value.includes(element));
+
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {value.map((element) => (
+          <Badge key={element} variant="secondary" className="flex items-center gap-1">
+            {element}
+            <button
+              type="button"
+              onClick={() => handleProductionRemove(element)}
+              className="ml-1 hover:text-destructive"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ))}
+        {customElements.map((element) => (
+          <Badge key={element} variant="secondary" className="flex items-center gap-1">
+            {element}
+            <button
+              type="button"
+              onClick={() => handleRemoveCustom(element)}
+              className="ml-1 hover:text-destructive"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ))}
+      </div>
+
       <div className="flex gap-2">
         <Input
           placeholder="Add custom production element..."
@@ -58,49 +89,19 @@ export function ProductionSelect({
         </Button>
       </div>
 
-      {customElements.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-sm font-medium">Custom Elements</div>
-          <div className="grid grid-cols-2 gap-4">
-            {customElements.map((element) => (
-              <div key={element} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`custom-${element}`}
-                  checked={true}
-                  onCheckedChange={(checked) => {
-                    if (!checked) handleRemoveCustom(element);
-                  }}
-                />
-                <label
-                  htmlFor={`custom-${element}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {element}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       <ScrollArea className="h-[200px] w-full rounded-md border p-4">
         <div className="grid grid-cols-2 gap-4">
-          {PRODUCTION_ELEMENTS.map((element) => (
-            <div key={element} className="flex items-center space-x-2">
-              <Checkbox
-                id={element}
-                checked={value.includes(element)}
-                onCheckedChange={(checked) => 
-                  handleProductionChange(element, checked as boolean)
-                }
-              />
-              <label
-                htmlFor={element}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {element}
-              </label>
-            </div>
+          {availableElements.map((element) => (
+            <Button
+              key={element}
+              type="button"
+              variant="outline"
+              className="justify-start"
+              onClick={() => handleProductionAdd(element)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {element}
+            </Button>
           ))}
         </div>
       </ScrollArea>
