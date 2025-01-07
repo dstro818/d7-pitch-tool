@@ -3,7 +3,6 @@ import { ProductionElement } from "@/types/pitch";
 import { PRODUCTION_ELEMENTS } from "@/constants/pitch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X } from "lucide-react";
 
@@ -19,7 +18,6 @@ export function ProductionSelect({
   onChange 
 }: ProductionSelectProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [customInput, setCustomInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleProductionAdd = (element: ProductionElement) => {
@@ -34,10 +32,11 @@ export function ProductionSelect({
     onChange(value.filter((e) => e !== element), customElements);
   };
 
-  const handleAddCustom = () => {
-    if (customInput.trim() && !customElements.includes(customInput.trim())) {
-      onChange(value, [...customElements, customInput.trim()]);
-      setCustomInput("");
+  const handleCustomAdd = () => {
+    if (searchTerm.trim() && !customElements.includes(searchTerm.trim())) {
+      onChange(value, [...customElements, searchTerm.trim()]);
+      setSearchTerm("");
+      setIsDropdownOpen(false);
     }
   };
 
@@ -50,6 +49,12 @@ export function ProductionSelect({
       !value.includes(element) && 
       element.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const showAddCustomOption = searchTerm.trim() && 
+    !PRODUCTION_ELEMENTS.some(element => 
+      element.toLowerCase() === searchTerm.toLowerCase()
+    ) &&
+    !customElements.includes(searchTerm.trim());
 
   return (
     <div className="space-y-4">
@@ -91,39 +96,33 @@ export function ProductionSelect({
           onFocus={() => setIsDropdownOpen(true)}
         />
 
-        {isDropdownOpen && searchTerm && filteredElements.length > 0 && (
+        {isDropdownOpen && searchTerm && (filteredElements.length > 0 || showAddCustomOption) && (
           <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
             <ScrollArea className="max-h-[200px]">
               {filteredElements.map((element) => (
                 <button
                   key={element}
                   type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between"
                   onClick={() => handleProductionAdd(element)}
                 >
-                  {element}
+                  <span>{element}</span>
+                  <Plus className="h-4 w-4" />
                 </button>
               ))}
+              {showAddCustomOption && (
+                <button
+                  type="button"
+                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between text-muted-foreground"
+                  onClick={handleCustomAdd}
+                >
+                  <span>Add "{searchTerm}"</span>
+                  <Plus className="h-4 w-4" />
+                </button>
+              )}
             </ScrollArea>
           </div>
         )}
-      </div>
-
-      <div className="flex gap-2">
-        <Input
-          placeholder="Add custom production element..."
-          value={customInput}
-          onChange={(e) => setCustomInput(e.target.value)}
-          className="flex-1"
-        />
-        <Button 
-          type="button"
-          variant="outline"
-          onClick={handleAddCustom}
-          disabled={!customInput.trim()}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );
