@@ -26,14 +26,14 @@ export const GENRES = [
   "Soft Rock", "Soundtrack", "Spoken Word", "Techno", "World"
 ] as const;
 
-export type Genre = (typeof GENRES)[number] | string;
+export type Genre = (typeof GENRES)[number];
 
 interface GenreSelectProps {
   value: Genre[];
   onChange: (value: Genre[]) => void;
 }
 
-export function GenreSelect({ value, onChange }: GenreSelectProps) {
+export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -44,9 +44,7 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
     );
   }, [searchValue]);
 
-  const handleSelect = (currentValue: string) => {
-    if (!currentValue) return;
-    
+  const handleSelect = (currentValue: Genre) => {
     const newValue = [...value];
     const exists = newValue.includes(currentValue);
 
@@ -58,11 +56,6 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
 
     setSearchValue("");
     setOpen(false);
-  };
-
-  const handleAddCustom = () => {
-    if (!searchValue.trim() || value.length >= 3) return;
-    handleSelect(searchValue.trim());
   };
 
   const removeGenre = (genreToRemove: Genre, e: React.MouseEvent) => {
@@ -118,19 +111,6 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
             onValueChange={setSearchValue}
             className="text-foreground"
           />
-          <CommandEmpty className="text-foreground p-2">
-            {searchValue && (
-              <Button
-                onClick={handleAddCustom}
-                className="w-full justify-start"
-                variant="ghost"
-                type="button"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add "{searchValue}"
-              </Button>
-            )}
-          </CommandEmpty>
           <CommandGroup className="max-h-[200px] overflow-y-auto">
             {filteredGenres.map((genre) => (
               <CommandItem

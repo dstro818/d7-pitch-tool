@@ -30,7 +30,11 @@ interface ProductionSelectProps {
   onChange: (value: ProductionElement[], customElements: string[]) => void;
 }
 
-export function ProductionSelect({ value, customElements, onChange }: ProductionSelectProps) {
+export function ProductionSelect({ 
+  value = [], 
+  customElements = [], 
+  onChange 
+}: ProductionSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -42,8 +46,6 @@ export function ProductionSelect({ value, customElements, onChange }: Production
   }, [searchValue]);
 
   const handleSelect = (currentValue: ProductionElement) => {
-    if (!currentValue) return;
-    
     const newValue = [...value];
     const exists = newValue.includes(currentValue);
 
