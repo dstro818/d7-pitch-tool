@@ -52,6 +52,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
       onChange(newValue.filter((v) => v !== currentValue));
     } else if (newValue.length < 3) {
       onChange([...newValue, currentValue]);
+      setOpen(false);
     }
   };
 
@@ -141,9 +142,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
               <CommandItem
                 key={genre}
                 value={genre}
-                onSelect={() => {
-                  handleSelect(genre);
-                }}
+                onSelect={() => handleSelect(genre)}
                 className={cn(
                   "cursor-pointer text-foreground hover:bg-accent",
                   value.includes(genre) && "opacity-50"

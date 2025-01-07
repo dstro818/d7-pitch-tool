@@ -53,6 +53,7 @@ export function ProductionSelect({
       onChange(newValue.filter((v) => v !== currentValue), customElements);
     } else {
       onChange([...newValue, currentValue], customElements);
+      setOpen(false);
     }
   };
 
@@ -155,9 +156,7 @@ export function ProductionSelect({
               <CommandItem
                 key={element}
                 value={element}
-                onSelect={() => {
-                  handleSelect(element);
-                }}
+                onSelect={() => handleSelect(element)}
                 className={cn(
                   "cursor-pointer text-foreground hover:bg-accent",
                   value.includes(element) && "opacity-50"
