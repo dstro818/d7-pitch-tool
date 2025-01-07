@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { PitchFormData } from "@/types/pitch";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Music, Copy, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
-  onRegenerate?: () => void;
+  onRegenerate?: (suggestions?: string) => void;
 }
 
 export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const { toast } = useToast();
+  const [suggestions, setSuggestions] = useState("");
 
   const formatPitchText = () => {
     const parts = [];
@@ -95,7 +97,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
 
   const handleRegenerate = () => {
     if (onRegenerate) {
-      onRegenerate();
+      onRegenerate(suggestions);
       toast({
         title: "Regenerating",
         description: "Generating new pitch suggestions...",
@@ -125,6 +127,17 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
               Start typing to see your pitch preview...
             </span>
           )}
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm text-muted-foreground">
+            Suggestions for AI (optional)
+          </label>
+          <Textarea
+            value={suggestions}
+            onChange={(e) => setSuggestions(e.target.value)}
+            placeholder="Add any specific suggestions for the AI to consider when generating the pitch..."
+            className="min-h-[100px]"
+          />
         </div>
       </CardContent>
       <CardFooter className="flex gap-2">

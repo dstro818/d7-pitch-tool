@@ -18,6 +18,9 @@ serve(async (req) => {
     const formData = await req.json();
     console.log('Received form data:', formData);
 
+    // Get user suggestions if provided
+    const { suggestions, ...pitchData } = formData;
+    
     // Ensure all fields have a value, use empty string if null/undefined
     const {
       title = '',
@@ -29,10 +32,10 @@ serve(async (req) => {
       custom_production_elements = [],
       artist_background = '',
       target_playlist = ''
-    } = formData;
+    } = pitchData;
 
     // Create a structured prompt for OpenAI
-    const prompt = `Generate a compelling music pitch under 500 characters using this information:
+    let prompt = `Generate a compelling music pitch under 500 characters using this information:
     Title: ${title}
     Artists: ${artists}
     Genres: ${genres.join(', ')}
@@ -40,9 +43,14 @@ serve(async (req) => {
     Production Elements: ${[...production_elements, ...custom_production_elements].join(', ')}
     Lyrics: ${lyrics}
     Artist Background: ${artist_background}
-    Target Playlist: ${target_playlist}
+    Target Playlist: ${target_playlist}`;
 
-    Format the pitch like this example:
+    // Add user suggestions if provided
+    if (suggestions) {
+      prompt += `\n\nAdditional suggestions to consider:\n${suggestions}`;
+    }
+
+    prompt += `\n\nFormat the pitch like this example:
     "Song Title - Artist Name, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
 
     Important rules:
@@ -62,7 +70,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           {
             role: 'system',

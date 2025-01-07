@@ -27,10 +27,10 @@ export function PitchForm() {
 
   const formValues = form.watch();
 
-  const generateAIPitch = async (data: PitchFormData) => {
+  const generateAIPitch = async (data: PitchFormData, suggestions?: string) => {
     try {
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
-        body: data
+        body: { ...data, suggestions }
       });
 
       if (error) throw error;
@@ -52,8 +52,8 @@ export function PitchForm() {
     }
   };
 
-  const handleRegenerate = () => {
-    generateAIPitch(formValues);
+  const handleRegenerate = (suggestions?: string) => {
+    generateAIPitch(formValues, suggestions);
   };
 
   const onSubmit = async (data: PitchFormData) => {
