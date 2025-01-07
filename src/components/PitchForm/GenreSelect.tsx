@@ -43,7 +43,11 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2 mb-2">
         {value.map((genre) => (
-          <Badge key={genre} variant="secondary" className="flex items-center gap-1">
+          <Badge 
+            key={genre} 
+            variant="secondary" 
+            className="flex items-center gap-1 bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
+          >
             {genre}
             <button
               type="button"
@@ -65,16 +69,17 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
             setIsDropdownOpen(true);
           }}
           onFocus={() => setIsDropdownOpen(true)}
+          className="glass-card border-white/10 focus:border-primary/50"
         />
 
         {isDropdownOpen && searchTerm && (filteredGenres.length > 0 || showAddCustomOption) && (
-          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
+          <div className="absolute z-50 w-full mt-1 bg-popover border border-white/10 rounded-md shadow-lg">
             <ScrollArea className="max-h-[200px]">
               {filteredGenres.map((genre) => (
                 <button
                   key={genre}
                   type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between"
+                  className="w-full px-4 py-2 text-left hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-between"
                   onClick={() => handleGenreAdd(genre)}
                   disabled={value.length >= 3}
                 >
@@ -85,7 +90,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
               {showAddCustomOption && value.length < 3 && (
                 <button
                   type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between text-muted-foreground"
+                  className="w-full px-4 py-2 text-left hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-between text-muted-foreground"
                   onClick={() => handleGenreAdd(searchTerm.trim())}
                 >
                   <span>Add "{searchTerm}"</span>

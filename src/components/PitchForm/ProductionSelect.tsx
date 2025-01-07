@@ -60,7 +60,11 @@ export function ProductionSelect({
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         {value.map((element) => (
-          <Badge key={element} variant="secondary" className="flex items-center gap-1">
+          <Badge 
+            key={element} 
+            variant="secondary" 
+            className="flex items-center gap-1 bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
+          >
             {element}
             <button
               type="button"
@@ -72,7 +76,11 @@ export function ProductionSelect({
           </Badge>
         ))}
         {customElements.map((element) => (
-          <Badge key={element} variant="secondary" className="flex items-center gap-1">
+          <Badge 
+            key={element} 
+            variant="secondary" 
+            className="flex items-center gap-1 bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
+          >
             {element}
             <button
               type="button"
@@ -94,16 +102,17 @@ export function ProductionSelect({
             setIsDropdownOpen(true);
           }}
           onFocus={() => setIsDropdownOpen(true)}
+          className="glass-card border-white/10 focus:border-primary/50"
         />
 
         {isDropdownOpen && searchTerm && (filteredElements.length > 0 || showAddCustomOption) && (
-          <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
+          <div className="absolute z-50 w-full mt-1 bg-popover border border-white/10 rounded-md shadow-lg">
             <ScrollArea className="max-h-[200px]">
               {filteredElements.map((element) => (
                 <button
                   key={element}
                   type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between"
+                  className="w-full px-4 py-2 text-left hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-between"
                   onClick={() => handleProductionAdd(element)}
                 >
                   <span>{element}</span>
@@ -113,7 +122,7 @@ export function ProductionSelect({
               {showAddCustomOption && (
                 <button
                   type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between text-muted-foreground"
+                  className="w-full px-4 py-2 text-left hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-between text-muted-foreground"
                   onClick={handleCustomAdd}
                 >
                   <span>Add "{searchTerm}"</span>
