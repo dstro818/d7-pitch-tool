@@ -8,14 +8,11 @@ import { ContentFields } from "./form-sections/ContentFields";
 import { ProductionFields } from "./form-sections/ProductionFields";
 import { PitchPreview } from "@/components/PitchForm/PitchPreview";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 export function PitchForm() {
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const form = useForm<PitchFormData>({
     defaultValues: {
@@ -34,6 +31,7 @@ export function PitchForm() {
   const formValues = form.watch();
 
   const generateAIPitch = async (data: PitchFormData, suggestions?: string) => {
+    setIsGenerating(true);
     try {
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
         body: { ...data, suggestions }
@@ -55,35 +53,16 @@ export function PitchForm() {
         description: "Failed to generate pitch. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
-  };
-
-  const handleRegenerate = (suggestions?: string) => {
-    generateAIPitch(formValues, suggestions);
   };
 
   const onSubmit = async (data: PitchFormData) => {
     try {
-      // Get the current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) throw userError;
-      
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to create a pitch.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { error } = await supabase
         .from('pitches')
-        .insert({
-          ...data,
-          user_id: user.id // Set the user_id to the current user's ID
-        });
+        .insert(data);
 
       if (error) throw error;
 
@@ -91,6 +70,9 @@ export function PitchForm() {
         title: "Success!",
         description: "Your pitch has been created.",
       });
+
+      // Generate AI pitch after saving
+      await generateAIPitch(data);
     } catch (error) {
       console.error('Error saving pitch:', error);
       toast({
@@ -117,6 +99,7 @@ export function PitchForm() {
           <Button
             type="submit"
             className="w-full neon-border hover-glow"
+            disabled={isGenerating}
           >
             Create Pitch
           </Button>
@@ -124,7 +107,11 @@ export function PitchForm() {
       </Form>
 
       <div className="lg:sticky lg:top-6 h-fit">
-        <PitchPreview data={formValues} onRegenerate={handleRegenerate} />
+        <PitchPreview 
+          data={formValues} 
+          onRegenerate={generateAIPitch} 
+          isGenerating={isGenerating}
+        />
       </div>
     </div>
   );
