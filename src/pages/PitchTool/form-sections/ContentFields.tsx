@@ -24,7 +24,7 @@ export function ContentFields({ control }: ContentFieldsProps) {
           <FormItem>
             <div className="flex items-center gap-2 mb-2">
               <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-              <FormLabel className="text-foreground">Theme</FormLabel>
+              <FormLabel className="text-foreground">Song Theme</FormLabel>
             </div>
             <FormControl>
               <div className="relative">

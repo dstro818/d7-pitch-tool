@@ -9,6 +9,10 @@ interface PitchPreviewProps {
 }
 
 export function PitchPreview({ data }: PitchPreviewProps) {
+  const genresText = data.genres && data.genres.length > 0 
+    ? `[${data.genres.join(', ')}]` 
+    : '';
+
   return (
     <Card className="w-full glass-card border-white/10">
       <CardHeader>
@@ -19,23 +23,9 @@ export function PitchPreview({ data }: PitchPreviewProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {data.genres && data.genres.length > 0 && (
-          <div className="flex items-start gap-2">
-            <ListMusic className="h-4 w-4 mt-1 shrink-0" />
-            <div>
-              <div className="flex flex-wrap gap-1">
-                {data.genres.map((genre) => (
-                  <Badge key={genre} variant="secondary">
-                    {genre}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
         {data.theme && (
           <div className="text-muted-foreground whitespace-pre-wrap">
+            {genresText && <span className="font-medium">{genresText} </span>}
             {data.theme}
           </div>
         )}
