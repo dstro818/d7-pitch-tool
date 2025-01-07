@@ -22,18 +22,16 @@ export function ContentFields({ control }: ContentFieldsProps) {
         name="theme"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-foreground">Song Theme/Story</FormLabel>
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+              <FormLabel className="text-foreground">Song Theme/Story</FormLabel>
+            </div>
             <FormControl>
-              <div className="relative">
-                <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
-                <div className="pl-9">
-                  <Textarea
-                    className="glass-card border-white/10 text-foreground min-h-[100px]"
-                    placeholder="Describe the theme or story behind your song"
-                    {...field}
-                  />
-                </div>
-              </div>
+              <Textarea
+                className="glass-card border-white/10 text-foreground min-h-[100px]"
+                placeholder="Describe the theme or story behind your song"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -45,18 +43,16 @@ export function ContentFields({ control }: ContentFieldsProps) {
         name="lyrics"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-foreground">Notable Lyrics</FormLabel>
+            <div className="flex items-center gap-2 mb-2">
+              <Quote className="h-3.5 w-3.5 text-muted-foreground" />
+              <FormLabel className="text-foreground">Notable Lyrics</FormLabel>
+            </div>
             <FormControl>
-              <div className="relative">
-                <Quote className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
-                <div className="pl-9">
-                  <Textarea
-                    className="glass-card border-white/10 text-foreground min-h-[100px]"
-                    placeholder="Share some notable lyrics from your song"
-                    {...field}
-                  />
-                </div>
-              </div>
+              <Textarea
+                className="glass-card border-white/10 text-foreground min-h-[100px]"
+                placeholder="Share some notable lyrics from your song"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
