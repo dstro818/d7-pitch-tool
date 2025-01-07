@@ -10,13 +10,18 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    // Initialize from localStorage on component mount
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Always authenticated in development
-    setIsAuthenticated(true);
-    localStorage.setItem('isAuthenticated', 'true');
+    // Set initial authentication state
+    if (!isAuthenticated) {
+      setIsAuthenticated(true);
+      localStorage.setItem('isAuthenticated', 'true');
+    }
   }, []);
 
   const login = () => {
@@ -31,17 +36,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate('/login');
   };
 
+  const value = {
+    isAuthenticated,
+    login,
+    logout,
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};
