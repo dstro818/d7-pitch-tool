@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { PitchFormData } from "@/types/pitch";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Music, Copy, Download, RefreshCw, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Textarea } from "@/components/ui/textarea";
+import { PitchSuggestions } from "./PitchSuggestions";
+import { PitchActions } from "./PitchActions";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
@@ -142,60 +142,23 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
             </span>
           )}
         </div>
-        <div className="space-y-2">
-          <label className="text-sm text-muted-foreground">
-            Suggestions for AI (optional)
-          </label>
-          <div className="flex gap-2">
-            <Textarea
-              value={suggestions}
-              onChange={(e) => setSuggestions(e.target.value)}
-              placeholder="Add any specific suggestions for the AI to consider when generating the pitch..."
-              className="min-h-[100px]"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleSendSuggestions}
-              disabled={!suggestions.trim() || isGenerating}
-              className="self-start"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        {showPreview && (
+          <PitchSuggestions
+            value={suggestions}
+            onChange={setSuggestions}
+            onSend={handleSendSuggestions}
+            isGenerating={isGenerating}
+          />
+        )}
       </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRegenerate}
-          className="flex items-center gap-2"
-          disabled={isGenerating}
-        >
-          <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-          {isGenerating ? 'Generating...' : 'Regenerate'}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          className="flex items-center gap-2"
-          disabled={!showPreview}
-        >
-          <Copy className="h-4 w-4" />
-          Copy
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExport}
-          className="flex items-center gap-2"
-          disabled={!showPreview}
-        >
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
+      <CardFooter>
+        <PitchActions
+          onRegenerate={handleRegenerate}
+          onCopy={handleCopy}
+          onExport={handleExport}
+          isGenerating={isGenerating}
+          showPreview={showPreview}
+        />
       </CardFooter>
     </Card>
   );
