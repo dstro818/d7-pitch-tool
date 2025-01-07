@@ -10,7 +10,6 @@ import { PitchPreview } from "@/components/PitchForm/PitchPreview";
 import { generatePitchSuggestions } from "@/utils/openai";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Wand2 } from "lucide-react";
 
 export function PitchForm() {
   const { toast } = useToast();
@@ -31,7 +30,7 @@ export function PitchForm() {
 
   const formValues = form.watch();
 
-  const handleEnhancePitch = async () => {
+  const handleRegenerate = async () => {
     try {
       if (!apiKey) {
         toast({
@@ -97,24 +96,13 @@ export function PitchForm() {
     <div className="grid lg:grid-cols-2 gap-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex gap-4 items-center">
-            <Input
-              type="password"
-              placeholder="Enter OpenAI API Key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="flex-grow"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleEnhancePitch}
-              className="flex items-center gap-2"
-            >
-              <Wand2 className="h-4 w-4" />
-              Enhance Pitch
-            </Button>
-          </div>
+          <Input
+            type="password"
+            placeholder="Enter OpenAI API Key"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="w-full"
+          />
           <div className="grid md:grid-cols-2 gap-6">
             <BasicInfoFields control={form.control} />
           </div>
@@ -134,7 +122,7 @@ export function PitchForm() {
       </Form>
 
       <div className="lg:sticky lg:top-6 h-fit">
-        <PitchPreview data={formValues} />
+        <PitchPreview data={formValues} onRegenerate={handleRegenerate} />
       </div>
     </div>
   );
