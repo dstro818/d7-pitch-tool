@@ -28,7 +28,7 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
               <div className="relative">
                 <Music className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  className="pl-9 glass-card border-white/10 text-foreground" 
+                  className="glass-card border-white/10 text-foreground" 
                   placeholder="Enter song title" 
                   {...field} 
                 />
@@ -49,7 +49,7 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
               <div className="relative">
                 <ListMusic className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  className="pl-9 glass-card border-white/10 text-foreground" 
+                  className="glass-card border-white/10 text-foreground" 
                   placeholder="Enter featured artists" 
                   {...field} 
                 />
@@ -87,7 +87,7 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
               <div className="relative">
                 <ListMusic className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  className="pl-9 glass-card border-white/10 text-foreground" 
+                  className="glass-card border-white/10 text-foreground" 
                   placeholder="Enter target playlist" 
                   {...field} 
                 />
