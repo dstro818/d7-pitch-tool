@@ -51,7 +51,7 @@ export function ProductionFields({ control, setValue, watch }: ProductionFieldsP
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Textarea
-                  className="pl-9 glass-card border-white/10 text-foreground min-h-[100px]"
+                  className="pl-9 glass-card border-white/10 text-foreground min-h-[100px] placeholder:text-left"
                   placeholder="Tell us about your background as an artist"
                   {...field}
                 />
