@@ -15,8 +15,44 @@ serve(async (req) => {
   }
 
   try {
-    const { title, artists, genres, theme, lyrics, production_elements, custom_production_elements, artist_background } = await req.json();
-    console.log('Generating pitch with data:', { title, artists, genres, theme, production_elements });
+    const formData = await req.json();
+    console.log('Received form data:', formData);
+
+    // Ensure all fields have a value, use empty string if null/undefined
+    const {
+      title = '',
+      artists = '',
+      genres = [],
+      theme = '',
+      lyrics = '',
+      production_elements = [],
+      custom_production_elements = [],
+      artist_background = '',
+      target_playlist = ''
+    } = formData;
+
+    // Create a structured prompt for OpenAI
+    const prompt = `Generate a compelling music pitch under 500 characters using this information:
+    Title: ${title}
+    Artists: ${artists}
+    Genres: ${genres.join(', ')}
+    Theme: ${theme}
+    Production Elements: ${[...production_elements, ...custom_production_elements].join(', ')}
+    Lyrics: ${lyrics}
+    Artist Background: ${artist_background}
+    Target Playlist: ${target_playlist}
+
+    Format the pitch like this example:
+    "Song Title - Artist Name, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
+
+    Important rules:
+    1. Keep it under 500 characters
+    2. Don't use brackets for genres
+    3. Only include sections that have content
+    4. Make it flow naturally like a paragraph
+    5. Keep the original information but make it more engaging`;
+
+    console.log('Sending prompt to OpenAI:', prompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -30,51 +66,39 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a music industry expert creating compelling song pitches. Create a concise pitch (max 500 characters) that follows this structure:
-            1. Start with "Title - Artists"
-            2. Include genres without brackets, separated by commas if multiple
-            3. Describe the theme and emotional impact
-            4. Mention production elements if provided
-            5. Include notable lyrics if provided
-            6. Add relevant artist background if space permits
-            
-            Keep the response engaging and under 500 characters. Do not use brackets or special formatting.`
+            content: 'You are a music industry expert that creates compelling and concise song pitches.'
           },
           {
             role: 'user',
-            content: `Generate a pitch for:
-            Title: ${title}
-            Artists: ${artists}
-            Genres: ${genres.join(', ')}
-            Theme: ${theme || 'Not provided'}
-            Production Elements: ${[...production_elements, ...custom_production_elements].join(', ')}
-            Lyrics: ${lyrics || 'Not provided'}
-            Artist Background: ${artist_background || 'Not provided'}`
+            content: prompt
           }
         ],
         temperature: 0.7,
-        max_tokens: 200,
       }),
     });
 
     const data = await response.json();
     console.log('OpenAI response:', data);
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('No content received from OpenAI');
     }
 
-    const suggestion = data.choices[0].message.content;
-    
+    const suggestion = data.choices[0].message.content.slice(0, 500);
+    console.log('Generated suggestion:', suggestion);
+
     return new Response(
       JSON.stringify({ suggestion }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error in generate-pitch function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   }
 });
