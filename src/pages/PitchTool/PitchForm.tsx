@@ -8,9 +8,22 @@ import { ContentFields } from "./form-sections/ContentFields";
 import { ProductionFields } from "./form-sections/ProductionFields";
 import { PitchPreview } from "@/components/PitchForm/PitchPreview";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export function PitchForm() {
   const { toast } = useToast();
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setUserId(session.user.id);
+      }
+    };
+    getUserId();
+  }, []);
+
   const form = useForm<PitchFormData>({
     defaultValues: {
       title: "",
@@ -29,14 +42,18 @@ export function PitchForm() {
 
   const generateAIPitch = async (data: PitchFormData, suggestions?: string) => {
     try {
+      if (!userId) {
+        throw new Error('No authenticated user found');
+      }
+
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
-        body: { ...data, suggestions }
+        body: { ...data, user_id: userId, suggestions }
       });
 
       if (error) throw error;
 
       if (response.suggestion) {
-        // Remove setting the theme field here
+        form.setValue('theme', response.suggestion);
         toast({
           title: "AI Pitch Generated",
           description: "Your pitch has been generated and saved.",
@@ -58,10 +75,7 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) throw sessionError;
-      if (!session?.user?.id) {
+      if (!userId) {
         throw new Error('No authenticated user found');
       }
 
@@ -73,7 +87,7 @@ export function PitchForm() {
         .from('pitches')
         .insert({
           ...data,
-          user_id: session.user.id
+          user_id: userId
         });
 
       if (error) throw error;
