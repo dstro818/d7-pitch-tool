@@ -3,114 +3,265 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
+import { GenreSelect } from "@/components/PitchForm/GenreSelect";
+import { ProductionSelect } from "@/components/PitchForm/ProductionSelect";
+import { PitchFormData } from "@/types/pitch";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Music,
+  Users,
+  FileText,
+  Quote,
+  User,
+  ListMusic,
+} from "lucide-react";
 
 const PitchTool = () => {
   const { logout } = useAuth();
-  const [formData, setFormData] = useState({
-    title: "",
-    artist: "",
-    genre: "",
-    theme: "",
-    lyrics: "",
-    production: ""
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const form = useForm<PitchFormData>({
+    defaultValues: {
+      title: "",
+      artists: "",
+      genres: [],
+      theme: "",
+      lyrics: "",
+      productionElements: [],
+      customProductionElements: [],
+      artistBackground: "",
+      targetPlaylist: "",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const onSubmit = async (data: PitchFormData) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Form submitted:", data);
+      toast({
+        title: "Success!",
+        description: "Your pitch has been created.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create pitch. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const formFields = form.watch();
+  const filledFieldsCount = Object.values(formFields).filter(
+    (value) => 
+      (Array.isArray(value) && value.length > 0) || 
+      (typeof value === "string" && value.trim() !== "")
+  ).length;
+
+  if (filledFieldsCount >= 5 && !isSubmitting) {
+    form.handleSubmit(onSubmit)();
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">DSTRO7 Pitch Tool</h1>
-          <Button variant="ghost" onClick={logout}>Logout</Button>
+          <Button variant="ghost" onClick={logout}>
+            Logout
+          </Button>
         </div>
       </nav>
 
       <div className="container mx-auto px-6 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold">Create Your Pitch</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Song Title</label>
-                <Input
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
                   name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Enter song title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Song Title</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Music className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input className="pl-9" placeholder="Enter song title" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="artists"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Featured Artists</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input className="pl-9" placeholder="Enter featured artists" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="genres"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Genres (up to 3)</FormLabel>
+                      <FormControl>
+                        <GenreSelect
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="targetPlaylist"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Playlist</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <ListMusic className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input className="pl-9" placeholder="Enter target playlist" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Artist Name</label>
-                <Input
-                  name="artist"
-                  value={formData.artist}
-                  onChange={handleChange}
-                  placeholder="Enter artist name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Genre</label>
-                <Input
-                  name="genre"
-                  value={formData.genre}
-                  onChange={handleChange}
-                  placeholder="Enter genre"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Theme</label>
-                <Textarea
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
                   name="theme"
-                  value={formData.theme}
-                  onChange={handleChange}
-                  placeholder="Describe the theme of your song"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Song Theme/Story</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Textarea
+                            className="pl-9 min-h-[100px]"
+                            placeholder="Describe the theme or story behind your song"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Key Lyrics</label>
-                <Textarea
+                <FormField
+                  control={form.control}
                   name="lyrics"
-                  value={formData.lyrics}
-                  onChange={handleChange}
-                  placeholder="Share some key lyrics"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notable Lyrics</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Quote className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Textarea
+                            className="pl-9 min-h-[100px]"
+                            placeholder="Share some notable lyrics from your song"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="productionElements"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Production Details</FormLabel>
+                      <FormControl>
+                        <ProductionSelect
+                          value={field.value}
+                          customElements={form.watch("customProductionElements")}
+                          onChange={(elements, customElements) => {
+                            field.onChange(elements);
+                            form.setValue("customProductionElements", customElements);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="artistBackground"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Artist Background</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Textarea
+                            className="pl-9 min-h-[100px]"
+                            placeholder="Tell us about your background as an artist"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Production Details</label>
-                <Textarea
-                  name="production"
-                  value={formData.production}
-                  onChange={handleChange}
-                  placeholder="Describe the production style"
-                />
-              </div>
-
-              <Button className="w-full">Generate Pitch</Button>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-2xl font-semibold mb-4">Preview</h2>
-            <div className="prose">
-              {formData.title && <p><strong>Title:</strong> {formData.title}</p>}
-              {formData.artist && <p><strong>Artist:</strong> {formData.artist}</p>}
-              {formData.genre && <p><strong>Genre:</strong> {formData.genre}</p>}
-              {formData.theme && <p><strong>Theme:</strong> {formData.theme}</p>}
-              {formData.lyrics && <p><strong>Key Lyrics:</strong> {formData.lyrics}</p>}
-              {formData.production && <p><strong>Production:</strong> {formData.production}</p>}
-            </div>
-          </div>
-        </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating Pitch..." : "Create Pitch"}
+              </Button>
+            </form>
+          </Form>
+        </motion.div>
       </div>
     </div>
   );
