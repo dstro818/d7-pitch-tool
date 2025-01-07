@@ -50,8 +50,18 @@
     );
   }
 
+  input, textarea, select {
+    background: linear-gradient(225deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+    @apply border-white/10 focus:border-primary/50 focus:ring-primary/20;
+  }
+
   .glass-card {
-    @apply bg-black/20 backdrop-blur-lg border border-white/10 rounded-lg shadow-xl;
+    background: linear-gradient(
+      135deg,
+      rgba(30, 41, 59, 0.4) 0%,
+      rgba(15, 23, 42, 0.7) 100%
+    );
+    @apply backdrop-blur-lg border border-white/10 rounded-lg shadow-xl;
   }
 
   .neon-border {
@@ -60,6 +70,16 @@
 
   .hover-glow {
     @apply transition-all duration-300 hover:shadow-[0_0_15px_rgba(139,92,246,0.5)];
+  }
+
+  .form-input-gradient {
+    background: linear-gradient(225deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+    @apply border-white/10 focus:border-primary/50 focus:ring-primary/20;
+  }
+
+  .button-gradient {
+    background: linear-gradient(225deg, #6366F1 0%, #4F46E5 100%);
+    @apply hover:opacity-90 transition-opacity;
   }
 }
 
