@@ -12,12 +12,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Using a valid UUID format for development
-const DEVELOPMENT_USER_ID = '00000000-0000-0000-0000-000000000000';
-
 export function PitchForm() {
   const { toast } = useToast();
-  const [userId] = useState(DEVELOPMENT_USER_ID);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
@@ -40,7 +36,7 @@ export function PitchForm() {
   const generateAIPitch = async (data: PitchFormData, suggestions?: string) => {
     try {
       const { data: response, error } = await supabase.functions.invoke('generate-pitch', {
-        body: { ...data, user_id: userId, suggestions }
+        body: { ...data, suggestions }
       });
 
       if (error) throw error;
@@ -68,11 +64,25 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
+      // Get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) throw userError;
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to create a pitch.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('pitches')
         .insert({
           ...data,
-          user_id: userId
+          user_id: user.id // Set the user_id to the current user's ID
         });
 
       if (error) throw error;
