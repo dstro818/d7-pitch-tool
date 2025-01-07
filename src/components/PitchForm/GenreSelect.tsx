@@ -4,7 +4,7 @@ import { GENRES } from "@/constants/pitch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 interface GenreSelectProps {
   value: Genre[];
@@ -15,13 +15,13 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleGenreRemove = (genre: Genre) => {
-    onChange(value.filter((g) => g !== genre));
+  const handleGenreRemove = (genre: Genre | string) => {
+    onChange(value.filter((g) => g !== genre) as Genre[]);
   };
 
-  const handleGenreAdd = (genre: Genre) => {
+  const handleGenreAdd = (genre: Genre | string) => {
     if (value.length < 3 && !value.includes(genre)) {
-      onChange([...value, genre]);
+      onChange([...value, genre] as Genre[]);
       setSearchTerm("");
       setIsDropdownOpen(false);
     }
@@ -32,6 +32,12 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
       !value.includes(genre) && 
       genre.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const showAddCustomOption = searchTerm.trim() && 
+    !GENRES.some(genre => 
+      genre.toLowerCase() === searchTerm.toLowerCase()
+    ) &&
+    !value.includes(searchTerm.trim() as Genre);
 
   return (
     <div className="space-y-2">
@@ -61,20 +67,31 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
           onFocus={() => setIsDropdownOpen(true)}
         />
 
-        {isDropdownOpen && searchTerm && filteredGenres.length > 0 && (
+        {isDropdownOpen && searchTerm && (filteredGenres.length > 0 || showAddCustomOption) && (
           <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
             <ScrollArea className="max-h-[200px]">
               {filteredGenres.map((genre) => (
                 <button
                   key={genre}
                   type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between"
                   onClick={() => handleGenreAdd(genre)}
                   disabled={value.length >= 3}
                 >
-                  {genre}
+                  <span>{genre}</span>
+                  <Plus className="h-4 w-4" />
                 </button>
               ))}
+              {showAddCustomOption && value.length < 3 && (
+                <button
+                  type="button"
+                  className="w-full px-4 py-2 text-left hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between text-muted-foreground"
+                  onClick={() => handleGenreAdd(searchTerm.trim())}
+                >
+                  <span>Add "{searchTerm}"</span>
+                  <Plus className="h-4 w-4" />
+                </button>
+              )}
             </ScrollArea>
           </div>
         )}
