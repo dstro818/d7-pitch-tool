@@ -33,9 +33,22 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
     return parts.join(' ');
   };
 
+  const pitchText = formatPitchText();
+  const characterCount = pitchText.length;
+  const isOverLimit = characterCount > 500;
+
   const handleCopy = async () => {
+    if (isOverLimit) {
+      toast({
+        title: "Error",
+        description: "Pitch exceeds 500 characters. Please shorten it before copying.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      await navigator.clipboard.writeText(formatPitchText());
+      await navigator.clipboard.writeText(pitchText);
       toast({
         title: "Copied!",
         description: "Pitch text copied to clipboard",
@@ -50,8 +63,17 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   };
 
   const handleExport = () => {
+    if (isOverLimit) {
+      toast({
+        title: "Error",
+        description: "Pitch exceeds 500 characters. Please shorten it before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const element = document.createElement("a");
-    const file = new Blob([formatPitchText()], {type: 'text/plain'});
+    const file = new Blob([pitchText], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
     element.download = "pitch.txt";
     document.body.appendChild(element);
@@ -84,7 +106,10 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-muted-foreground">
-          {formatPitchText()}
+          {pitchText}
+          <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
+            {characterCount}/500 characters
+          </div>
         </div>
 
         {data.lyrics && (
@@ -121,6 +146,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleCopy}
           className="flex items-center gap-2"
+          disabled={isOverLimit}
         >
           <Copy className="h-4 w-4" />
           Copy
@@ -130,6 +156,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleExport}
           className="flex items-center gap-2"
+          disabled={isOverLimit}
         >
           <Download className="h-4 w-4" />
           Export
