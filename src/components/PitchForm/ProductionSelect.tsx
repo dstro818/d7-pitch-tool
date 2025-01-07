@@ -43,7 +43,9 @@ export const ProductionSelect = ({
     }
   };
 
-  const removeElement = (element: ProductionElement | string) => {
+  const removeElement = (e: React.MouseEvent, element: ProductionElement | string) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (PRODUCTION_ELEMENTS.includes(element as ProductionElement)) {
       onChange(
         value.filter((v) => v !== element),
@@ -57,7 +59,12 @@ export const ProductionSelect = ({
     }
   };
 
-  const addCustomElement = () => {
+  const addCustomElement = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (customInput.trim() && !customElements.includes(customInput.trim())) {
       onChange(value, [...customElements, customInput.trim()]);
       setCustomInput("");
@@ -76,6 +83,7 @@ export const ProductionSelect = ({
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between"
+            type="button"
           >
             <div className="flex gap-2 items-center">
               <Music2 className="h-4 w-4 shrink-0" />
@@ -87,10 +95,7 @@ export const ProductionSelect = ({
                         key={element}
                         variant="secondary"
                         className="mr-1 cursor-pointer hover:bg-secondary/80"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeElement(element);
-                        }}
+                        onClick={(e) => removeElement(e, element)}
                       >
                         {element}
                         <X className="h-3 w-3 ml-1" />
@@ -120,7 +125,14 @@ export const ProductionSelect = ({
                       }
                     }}
                   />
-                  <Button size="sm" onClick={addCustomElement}>
+                  <Button 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addCustomElement();
+                    }}
+                    type="button"
+                  >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>

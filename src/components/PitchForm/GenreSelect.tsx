@@ -35,11 +35,18 @@ export const GenreSelect = ({ value, onChange }: GenreSelectProps) => {
     }
   };
 
-  const removeGenre = (genreToRemove: Genre) => {
+  const removeGenre = (e: React.MouseEvent, genreToRemove: Genre) => {
+    e.preventDefault();
+    e.stopPropagation();
     onChange(value.filter((genre) => genre !== genreToRemove));
   };
 
-  const addCustomGenre = () => {
+  const addCustomGenre = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (
       customInput.trim() && 
       !value.includes(customInput.trim()) && 
@@ -60,6 +67,7 @@ export const GenreSelect = ({ value, onChange }: GenreSelectProps) => {
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between"
+            type="button"
           >
             <div className="flex gap-2 items-center">
               <Music className="h-4 w-4 shrink-0" />
@@ -71,10 +79,7 @@ export const GenreSelect = ({ value, onChange }: GenreSelectProps) => {
                         key={genre} 
                         variant="secondary" 
                         className="mr-1 cursor-pointer hover:bg-secondary/80"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeGenre(genre);
-                        }}
+                        onClick={(e) => removeGenre(e, genre)}
                       >
                         {genre}
                         <X className="h-3 w-3 ml-1" />
@@ -106,8 +111,12 @@ export const GenreSelect = ({ value, onChange }: GenreSelectProps) => {
                   />
                   <Button 
                     size="sm"
-                    onClick={addCustomGenre}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addCustomGenre();
+                    }}
                     disabled={value.length >= 3}
+                    type="button"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
