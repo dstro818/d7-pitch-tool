@@ -8,9 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
+  onRegenerate?: () => void;
 }
 
-export function PitchPreview({ data }: PitchPreviewProps) {
+export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const { toast } = useToast();
 
   const formatPitchText = () => {
@@ -63,6 +64,16 @@ export function PitchPreview({ data }: PitchPreviewProps) {
     });
   };
 
+  const handleRegenerate = () => {
+    if (onRegenerate) {
+      onRegenerate();
+      toast({
+        title: "Regenerating",
+        description: "Generating new pitch suggestions...",
+      });
+    }
+  };
+
   return (
     <Card className="w-full glass-card border-white/10">
       <CardHeader>
@@ -96,6 +107,15 @@ export function PitchPreview({ data }: PitchPreviewProps) {
         )}
       </CardContent>
       <CardFooter className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRegenerate}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Regenerate
+        </Button>
         <Button
           variant="outline"
           size="sm"
