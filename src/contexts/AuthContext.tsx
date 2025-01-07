@@ -1,57 +1,35 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { Session } from '@supabase/supabase-js';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  login: () => void;
+  login: (password: string) => boolean;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const login = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/pitch`,
-      },
-    });
-
-    if (error) {
-      console.error('Error logging in:', error.message);
+  const login = (password: string) => {
+    if (password === "123") {
+      setIsAuthenticated(true);
+      navigate('/pitch');
+      return true;
     }
+    return false;
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
+  const logout = () => {
+    setIsAuthenticated(false);
     navigate('/login');
   };
 
   return (
     <AuthContext.Provider value={{ 
-      isAuthenticated: !!session, 
+      isAuthenticated, 
       login, 
       logout 
     }}>
