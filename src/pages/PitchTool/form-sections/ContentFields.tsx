@@ -30,7 +30,7 @@ export function ContentFields({ control }: ContentFieldsProps) {
               <div className="relative">
                 <Textarea
                   className="glass-card border-white/10 text-foreground min-h-[100px]"
-                  placeholder="[Artist] teams up with [Collaborator] for [Song Title], a [description of style/theme] track about [main topic]. Lyrics like [notable lyrics] capture [emotional impact]. The song blends [musical elements] with [unique features], showcasing [artist qualities]."
+                  placeholder="[Artist] teams up with [Collaborator] for [Song Title], a [style] track about [topic]. The song blends [musical elements], showcasing [artist qualities]."
                   maxLength={500}
                   {...field}
                 />
