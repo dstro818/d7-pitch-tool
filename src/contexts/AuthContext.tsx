@@ -10,16 +10,15 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Always authenticated in dev mode
+  // In development mode, we'll always be authenticated
+  const [isAuthenticated] = useState(true);
   const navigate = useNavigate();
 
   const login = () => {
-    setIsAuthenticated(true);
     navigate('/pitch');
   };
 
   const logout = () => {
-    setIsAuthenticated(true); // Keep authenticated in dev mode
     navigate('/login');
   };
 
