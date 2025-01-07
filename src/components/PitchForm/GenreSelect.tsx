@@ -40,6 +40,7 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
   const [searchValue, setSearchValue] = useState("");
 
   const handleSelect = (currentValue: string) => {
+    setOpen(false);
     if (value.length < 3 && !value.includes(currentValue)) {
       onChange([...value, currentValue]);
       setSearchValue("");
@@ -110,7 +111,7 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-background border border-input">
+      <PopoverContent className="w-full p-0 bg-popover">
         <Command className="bg-transparent">
           <CommandInput 
             placeholder="Search genres..." 
