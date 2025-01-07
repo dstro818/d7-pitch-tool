@@ -56,14 +56,12 @@ export function ProductionSelect({
     }
 
     setSearchValue("");
-    setOpen(false);
   };
 
   const handleAddCustom = () => {
     if (!searchValue.trim()) return;
     onChange(value, [...customElements, searchValue.trim()]);
     setSearchValue("");
-    setOpen(false);
   };
 
   const removeElement = (element: ProductionElement | string, e: React.MouseEvent) => {
@@ -124,8 +122,8 @@ export function ProductionSelect({
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-popover">
-        <Command className="bg-transparent">
+      <PopoverContent className="w-full p-0 bg-background border shadow-md z-50">
+        <Command className="bg-background">
           <CommandInput 
             placeholder="Search elements..." 
             value={searchValue}
