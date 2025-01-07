@@ -7,13 +7,10 @@ import { BasicInfoFields } from "./form-sections/BasicInfoFields";
 import { ContentFields } from "./form-sections/ContentFields";
 import { ProductionFields } from "./form-sections/ProductionFields";
 import { PitchPreview } from "@/components/PitchForm/PitchPreview";
-import { generatePitchSuggestions } from "@/utils/openai";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 
 export function PitchForm() {
   const { toast } = useToast();
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
   const form = useForm<PitchFormData>({
     defaultValues: {
       title: "",
@@ -32,33 +29,26 @@ export function PitchForm() {
 
   const handleRegenerate = async () => {
     try {
-      if (!apiKey) {
-        toast({
-          title: "API Key Required",
-          description: "Please enter your OpenAI API key first.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      localStorage.setItem('openai_api_key', apiKey);
-      
       const prompt = `Create a compelling pitch for a song titled "${formValues.title}" by ${formValues.artists || 'unknown artist'}. 
         Current theme: ${formValues.theme || 'none'}
         Current genres: ${formValues.genres.join(', ') || 'none'}
         Current production elements: ${[...formValues.productionElements, ...formValues.customProductionElements].join(', ') || 'none'}
         Please suggest improvements to make this pitch more engaging.`;
 
-      const suggestions = await generatePitchSuggestions(prompt);
+      const { data, error } = await supabase.functions.invoke('generate-pitch', {
+        body: { prompt }
+      });
 
-      if (suggestions.theme) {
-        form.setValue('theme', suggestions.theme);
+      if (error) throw error;
+
+      if (data.theme) {
+        form.setValue('theme', data.theme);
       }
-      if (suggestions.genres) {
-        form.setValue('genres', suggestions.genres);
+      if (data.genres) {
+        form.setValue('genres', data.genres);
       }
-      if (suggestions.productionElements) {
-        form.setValue('productionElements', suggestions.productionElements);
+      if (data.productionElements) {
+        form.setValue('productionElements', data.productionElements);
       }
 
       toast({
@@ -66,9 +56,10 @@ export function PitchForm() {
         description: "AI suggestions have been applied to your pitch.",
       });
     } catch (error) {
+      console.error('Error generating pitch:', error);
       toast({
         title: "Error",
-        description: "Failed to generate suggestions. Please check your API key and try again.",
+        description: "Failed to generate suggestions. Please try again.",
         variant: "destructive",
       });
     }
@@ -76,14 +67,21 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Form submitted:", data);
+      const { error } = await supabase
+        .from('pitches')
+        .insert([{
+          ...data,
+          user_id: (await supabase.auth.getUser()).data.user?.id
+        }]);
+
+      if (error) throw error;
+
       toast({
         title: "Success!",
         description: "Your pitch has been created.",
       });
     } catch (error) {
+      console.error('Error saving pitch:', error);
       toast({
         title: "Error",
         description: "Failed to create pitch. Please try again.",
@@ -96,13 +94,6 @@ export function PitchForm() {
     <div className="grid lg:grid-cols-2 gap-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <Input
-            type="password"
-            placeholder="Enter OpenAI API Key"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            className="w-full"
-          />
           <div className="grid md:grid-cols-2 gap-6">
             <BasicInfoFields control={form.control} />
           </div>

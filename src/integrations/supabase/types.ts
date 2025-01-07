@@ -9,7 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      pitches: {
+        Row: {
+          artist_background: string | null
+          artists: string
+          created_at: string | null
+          custom_production_elements: string[] | null
+          genres: string[] | null
+          id: string
+          lyrics: string | null
+          production_elements: string[] | null
+          target_playlist: string | null
+          theme: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          artist_background?: string | null
+          artists: string
+          created_at?: string | null
+          custom_production_elements?: string[] | null
+          genres?: string[] | null
+          id?: string
+          lyrics?: string | null
+          production_elements?: string[] | null
+          target_playlist?: string | null
+          theme?: string | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          artist_background?: string | null
+          artists?: string
+          created_at?: string | null
+          custom_production_elements?: string[] | null
+          genres?: string[] | null
+          id?: string
+          lyrics?: string | null
+          production_elements?: string[] | null
+          target_playlist?: string | null
+          theme?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
