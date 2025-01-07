@@ -37,11 +37,12 @@ interface GenreSelectProps {
 export function GenreSelect({ value, onChange }: GenreSelectProps) {
   const [open, setOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const handleSelect = (currentValue: string) => {
     if (value.length < 3 && !value.includes(currentValue)) {
       onChange([...value, currentValue]);
-      setOpen(false);
+      setSearchValue("");
     }
   };
 
@@ -66,6 +67,10 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
     }
   };
 
+  const filteredGenres = GENRES.filter((genre) =>
+    genre.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -73,7 +78,7 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between form-input-gradient text-foreground"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -105,35 +110,40 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Search genres..." />
-          <CommandEmpty>No genre found.</CommandEmpty>
-          <CommandGroup>
+      <PopoverContent className="w-full p-0 glass-card">
+        <Command className="bg-transparent">
+          <CommandInput 
+            placeholder="Search genres..." 
+            value={searchValue}
+            onValueChange={setSearchValue}
+            className="form-input-gradient text-foreground"
+          />
+          <CommandEmpty className="text-foreground">No genre found.</CommandEmpty>
+          <CommandGroup className="max-h-[200px] overflow-y-auto">
             <div className="flex items-center gap-2 p-2">
               <Input
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 placeholder="Add custom genre..."
-                className="h-8"
+                className="h-8 form-input-gradient text-foreground"
               />
               <Button 
                 size="sm"
                 onClick={addCustomGenre}
                 disabled={value.length >= 3}
                 type="button"
-                className="h-8"
+                className="h-8 button-gradient"
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            {GENRES.map((genre) => (
+            {filteredGenres.map((genre) => (
               <CommandItem
                 key={genre}
                 value={genre}
                 onSelect={() => handleSelect(genre)}
                 className={cn(
-                  "cursor-pointer",
+                  "cursor-pointer text-foreground hover:bg-white/10",
                   value.includes(genre) && "opacity-50"
                 )}
               >

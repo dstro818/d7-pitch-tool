@@ -34,11 +34,12 @@ interface ProductionSelectProps {
 export function ProductionSelect({ value, customElements, onChange }: ProductionSelectProps) {
   const [open, setOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const handleSelect = (currentValue: ProductionElement) => {
     if (!value.includes(currentValue)) {
       onChange([...value, currentValue], customElements);
-      setOpen(false);
+      setSearchValue("");
     }
   };
 
@@ -71,6 +72,9 @@ export function ProductionSelect({ value, customElements, onChange }: Production
   };
 
   const allElements = [...value, ...customElements];
+  const filteredElements = PRODUCTION_ELEMENTS.filter((element) =>
+    element.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -79,7 +83,7 @@ export function ProductionSelect({ value, customElements, onChange }: Production
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between form-input-gradient text-foreground"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -111,34 +115,39 @@ export function ProductionSelect({ value, customElements, onChange }: Production
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Search elements..." />
-          <CommandEmpty>No element found.</CommandEmpty>
-          <CommandGroup>
+      <PopoverContent className="w-full p-0 glass-card">
+        <Command className="bg-transparent">
+          <CommandInput 
+            placeholder="Search elements..." 
+            value={searchValue}
+            onValueChange={setSearchValue}
+            className="form-input-gradient text-foreground"
+          />
+          <CommandEmpty className="text-foreground">No element found.</CommandEmpty>
+          <CommandGroup className="max-h-[200px] overflow-y-auto">
             <div className="flex items-center gap-2 p-2">
               <Input
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 placeholder="Add custom element..."
-                className="h-8"
+                className="h-8 form-input-gradient text-foreground"
               />
               <Button 
                 size="sm"
                 onClick={addCustomElement}
                 type="button"
-                className="h-8"
+                className="h-8 button-gradient"
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            {PRODUCTION_ELEMENTS.map((element) => (
+            {filteredElements.map((element) => (
               <CommandItem
                 key={element}
                 value={element}
                 onSelect={() => handleSelect(element)}
                 className={cn(
-                  "cursor-pointer",
+                  "cursor-pointer text-foreground hover:bg-white/10",
                   value.includes(element) && "opacity-50"
                 )}
               >
