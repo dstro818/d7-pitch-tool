@@ -23,6 +23,16 @@ serve(async (req) => {
 
     console.log('Generating pitch with prompt:', prompt);
 
+    const systemPrompt = `You are a music industry expert helping to create compelling song pitches. 
+    Create a concise pitch (max 500 characters) that follows this structure:
+    1. Start with the title and artists
+    2. Include the genre(s) in square brackets
+    3. Describe the theme and emotional impact
+    4. Highlight key production elements
+    5. Add relevant artist background if space permits
+    
+    Keep the response engaging and under 500 characters.`;
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -32,12 +42,11 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          {
-            role: 'system',
-            content: 'You are a music industry expert helping to create compelling song pitches. Keep your responses concise and focused on making the pitch more engaging.'
-          },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt }
         ],
+        temperature: 0.7,
+        max_tokens: 200,
       }),
     });
 
