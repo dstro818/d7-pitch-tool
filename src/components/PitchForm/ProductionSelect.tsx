@@ -115,28 +115,28 @@ export function ProductionSelect({ value, customElements, onChange }: Production
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 glass-card">
+      <PopoverContent className="w-full p-0 bg-background border border-input">
         <Command className="bg-transparent">
           <CommandInput 
             placeholder="Search elements..." 
             value={searchValue}
             onValueChange={setSearchValue}
-            className="form-input-gradient text-foreground"
+            className="text-foreground"
           />
-          <CommandEmpty className="text-foreground">No element found.</CommandEmpty>
+          <CommandEmpty className="text-foreground p-2">No element found.</CommandEmpty>
           <CommandGroup className="max-h-[200px] overflow-y-auto">
             <div className="flex items-center gap-2 p-2">
               <Input
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 placeholder="Add custom element..."
-                className="h-8 form-input-gradient text-foreground"
+                className="h-8 text-foreground"
               />
               <Button 
                 size="sm"
                 onClick={addCustomElement}
                 type="button"
-                className="h-8 button-gradient"
+                className="h-8"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -147,7 +147,7 @@ export function ProductionSelect({ value, customElements, onChange }: Production
                 value={element}
                 onSelect={() => handleSelect(element)}
                 className={cn(
-                  "cursor-pointer text-foreground hover:bg-white/10",
+                  "cursor-pointer text-foreground hover:bg-accent",
                   value.includes(element) && "opacity-50"
                 )}
               >
