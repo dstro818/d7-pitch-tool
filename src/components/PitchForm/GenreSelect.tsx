@@ -53,7 +53,6 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
     } else if (newValue.length < 3) {
       onChange([...newValue, currentValue]);
     }
-
     setSearchValue("");
   };
 
@@ -70,7 +69,7 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between form-input-gradient text-foreground bg-background"
+          className="w-full justify-between form-input-gradient text-foreground bg-background hover:bg-accent/50"
           type="button"
         >
           <div className="flex gap-2 items-center">
@@ -103,12 +102,13 @@ export function GenreSelect({ value = [], onChange }: GenreSelectProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-full p-0 bg-background border shadow-md" 
+        className="w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
         side="bottom"
         sideOffset={5}
+        style={{ zIndex: 50 }}
       >
-        <Command className="bg-background">
+        <Command className="bg-popover border rounded-lg shadow-md">
           <CommandInput 
             placeholder="Search genres..." 
             value={searchValue}
