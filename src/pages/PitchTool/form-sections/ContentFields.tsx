@@ -25,12 +25,14 @@ export function ContentFields({ control }: ContentFieldsProps) {
             <FormLabel className="text-foreground">Song Theme/Story</FormLabel>
             <FormControl>
               <div className="relative">
-                <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Textarea
-                  className="pl-9 glass-card border-white/10 text-foreground min-h-[100px] placeholder:text-left"
-                  placeholder="Describe the theme or story behind your song"
-                  {...field}
-                />
+                <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                <div className="pl-9">
+                  <Textarea
+                    className="glass-card border-white/10 text-foreground min-h-[100px]"
+                    placeholder="Describe the theme or story behind your song"
+                    {...field}
+                  />
+                </div>
               </div>
             </FormControl>
             <FormMessage />
@@ -46,12 +48,14 @@ export function ContentFields({ control }: ContentFieldsProps) {
             <FormLabel className="text-foreground">Notable Lyrics</FormLabel>
             <FormControl>
               <div className="relative">
-                <Quote className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Textarea
-                  className="pl-9 glass-card border-white/10 text-foreground min-h-[100px] placeholder:text-left"
-                  placeholder="Share some notable lyrics from your song"
-                  {...field}
-                />
+                <Quote className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                <div className="pl-9">
+                  <Textarea
+                    className="glass-card border-white/10 text-foreground min-h-[100px]"
+                    placeholder="Share some notable lyrics from your song"
+                    {...field}
+                  />
+                </div>
               </div>
             </FormControl>
             <FormMessage />

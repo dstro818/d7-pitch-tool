@@ -49,12 +49,14 @@ export function ProductionFields({ control, setValue, watch }: ProductionFieldsP
             <FormLabel className="text-foreground">Artist Background</FormLabel>
             <FormControl>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Textarea
-                  className="pl-9 glass-card border-white/10 text-foreground min-h-[100px] placeholder:text-left"
-                  placeholder="Tell us about your background as an artist"
-                  {...field}
-                />
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                <div className="pl-9">
+                  <Textarea
+                    className="glass-card border-white/10 text-foreground min-h-[100px]"
+                    placeholder="Tell us about your background as an artist"
+                    {...field}
+                  />
+                </div>
               </div>
             </FormControl>
             <FormMessage />
