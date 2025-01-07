@@ -21,7 +21,10 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       parts.push(`[${data.genres.join(', ')}]`);
     }
     
-    parts.push(data.title || "Untitled Track");
+    if (data.title) {
+      parts.push(data.title);
+    }
+    
     if (data.artists) {
       parts.push(`ft. ${data.artists}`);
     }
@@ -36,6 +39,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
   const pitchText = formatPitchText();
   const characterCount = pitchText.length;
   const isOverLimit = characterCount > 500;
+  const showPreview = characterCount > 0;
 
   const handleCopy = async () => {
     if (isOverLimit) {
@@ -106,10 +110,20 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-muted-foreground">
-          {pitchText}
-          <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
-            {characterCount}/500 characters
-          </div>
+          {showPreview ? (
+            <>
+              {pitchText}
+              {characterCount > 0 && (
+                <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  {characterCount}/500 characters
+                </div>
+              )}
+            </>
+          ) : (
+            <span className="text-muted-foreground/50 italic">
+              Start typing to see your pitch preview...
+            </span>
+          )}
         </div>
 
         {data.lyrics && (
@@ -146,7 +160,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleCopy}
           className="flex items-center gap-2"
-          disabled={isOverLimit}
+          disabled={isOverLimit || !showPreview}
         >
           <Copy className="h-4 w-4" />
           Copy
@@ -156,7 +170,7 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           size="sm"
           onClick={handleExport}
           className="flex items-center gap-2"
-          disabled={isOverLimit}
+          disabled={isOverLimit || !showPreview}
         >
           <Download className="h-4 w-4" />
           Export
