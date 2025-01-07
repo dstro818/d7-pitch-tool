@@ -22,7 +22,7 @@ export function ProductionFields({ control, setValue, watch }: ProductionFieldsP
     <div className="space-y-6">
       <FormField
         control={control}
-        name="productionElements"
+        name="production_elements"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center gap-2 mb-2">
@@ -32,10 +32,10 @@ export function ProductionFields({ control, setValue, watch }: ProductionFieldsP
             <FormControl>
               <ProductionSelect
                 value={field.value}
-                customElements={watch("customProductionElements")}
+                customElements={watch("custom_production_elements")}
                 onChange={(elements, customElements) => {
                   field.onChange(elements);
-                  setValue("customProductionElements", customElements);
+                  setValue("custom_production_elements", customElements);
                 }}
               />
             </FormControl>
@@ -46,7 +46,7 @@ export function ProductionFields({ control, setValue, watch }: ProductionFieldsP
 
       <FormField
         control={control}
-        name="artistBackground"
+        name="artist_background"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center gap-2 mb-2">

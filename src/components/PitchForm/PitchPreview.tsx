@@ -135,9 +135,9 @@ export function PitchPreview({ data, onRegenerate }: PitchPreviewProps) {
           </div>
         )}
 
-        {(data.productionElements?.length > 0 || data.customProductionElements?.length > 0) && (
+        {(data.production_elements?.length > 0 || data.custom_production_elements?.length > 0) && (
           <div className="flex flex-wrap gap-1">
-            {[...(data.productionElements || []), ...(data.customProductionElements || [])].map((element) => (
+            {[...(data.production_elements || []), ...(data.custom_production_elements || [])].map((element) => (
               <Badge key={element} variant="secondary">
                 {element}
               </Badge>

@@ -79,7 +79,7 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
 
       <FormField
         control={control}
-        name="targetPlaylist"
+        name="target_playlist"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-foreground">Target Playlist</FormLabel>
