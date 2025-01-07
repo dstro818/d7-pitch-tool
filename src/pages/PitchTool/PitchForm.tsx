@@ -41,20 +41,13 @@ export function PitchForm() {
 
       if (error) throw error;
 
-      if (data.theme) {
-        form.setValue('theme', data.theme);
+      if (data.suggestion) {
+        form.setValue('theme', data.suggestion);
+        toast({
+          title: "Pitch Enhanced",
+          description: "AI suggestions have been applied to your pitch.",
+        });
       }
-      if (data.genres) {
-        form.setValue('genres', data.genres);
-      }
-      if (data.productionElements) {
-        form.setValue('productionElements', data.productionElements);
-      }
-
-      toast({
-        title: "Pitch Enhanced",
-        description: "AI suggestions have been applied to your pitch.",
-      });
     } catch (error) {
       console.error('Error generating pitch:', error);
       toast({
