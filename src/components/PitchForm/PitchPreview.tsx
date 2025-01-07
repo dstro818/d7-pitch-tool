@@ -2,7 +2,7 @@ import React from "react";
 import { PitchFormData } from "@/types/pitch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Music, Users, FileText, Quote, User, ListMusic } from "lucide-react";
+import { Music, Quote } from "lucide-react";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
@@ -10,17 +10,25 @@ interface PitchPreviewProps {
 
 export function PitchPreview({ data }: PitchPreviewProps) {
   const formatPitchText = () => {
-    if (!data.theme) return '';
+    const parts = [];
     
-    const genreText = data.genres && data.genres.length > 0 
-      ? `[${data.genres.join(', ')}] `
-      : '';
-
-    const artistText = data.artists 
-      ? ` ft. ${data.artists}`
-      : '';
-
-    return `${genreText}${data.title || "Untitled Track"}${artistText}. ${data.theme}`;
+    // Add genres in brackets if they exist
+    if (data.genres && data.genres.length > 0) {
+      parts.push(`[${data.genres.join(', ')}]`);
+    }
+    
+    // Add title and artists
+    parts.push(data.title || "Untitled Track");
+    if (data.artists) {
+      parts.push(`ft. ${data.artists}`);
+    }
+    
+    // Add theme after a period
+    if (data.theme) {
+      parts.push(data.theme);
+    }
+    
+    return parts.join(' ');
   };
 
   return (
@@ -32,31 +40,26 @@ export function PitchPreview({ data }: PitchPreviewProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-muted-foreground whitespace-pre-wrap">
+        <div className="text-muted-foreground">
           {formatPitchText()}
         </div>
 
         {data.lyrics && (
           <div className="flex items-start gap-2">
             <Quote className="h-4 w-4 mt-1 shrink-0" />
-            <div className="text-muted-foreground whitespace-pre-wrap italic">
+            <div className="text-muted-foreground italic">
               "{data.lyrics}"
             </div>
           </div>
         )}
 
         {(data.productionElements?.length > 0 || data.customProductionElements?.length > 0) && (
-          <div className="flex items-start gap-2">
-            <Music className="h-4 w-4 mt-1 shrink-0" />
-            <div>
-              <div className="flex flex-wrap gap-1">
-                {[...(data.productionElements || []), ...(data.customProductionElements || [])].map((element) => (
-                  <Badge key={element} variant="secondary">
-                    {element}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-1">
+            {[...(data.productionElements || []), ...(data.customProductionElements || [])].map((element) => (
+              <Badge key={element} variant="secondary">
+                {element}
+              </Badge>
+            ))}
           </div>
         )}
       </CardContent>
