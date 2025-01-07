@@ -1,12 +1,11 @@
 import { Control } from "react-hook-form";
 import { PitchFormData } from "@/types/pitch";
 import {
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
+  FormControl,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Quote } from "lucide-react";
@@ -17,7 +16,7 @@ interface ContentFieldsProps {
 
 export function ContentFields({ control }: ContentFieldsProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <FormField
         control={control}
         name="theme"
@@ -27,14 +26,11 @@ export function ContentFields({ control }: ContentFieldsProps) {
               <FileText className="h-3.5 w-3.5 text-muted-foreground" />
               <FormLabel className="text-foreground">Song Theme/Story</FormLabel>
             </div>
-            <FormDescription>
-              Describe the theme, story, and significance of the song. Include key lyrics and their meaning, production elements, and artist background where relevant.
-            </FormDescription>
             <FormControl>
               <div className="relative">
                 <Textarea
                   className="glass-card border-white/10 text-foreground min-h-[100px]"
-                  placeholder="Example: [Artist] teams up with [Collaborator] for [Song Title], a [description of style/theme] track about [main topic]. Lyrics like [notable lyrics] capture [emotional impact]. The song blends [musical elements] with [unique features], showcasing [artist qualities]."
+                  placeholder="[Artist] teams up with [Collaborator] for [Song Title], a [description of style/theme] track about [main topic]. Lyrics like [notable lyrics] capture [emotional impact]. The song blends [musical elements] with [unique features], showcasing [artist qualities]."
                   maxLength={500}
                   {...field}
                 />
@@ -57,9 +53,6 @@ export function ContentFields({ control }: ContentFieldsProps) {
               <Quote className="h-3.5 w-3.5 text-muted-foreground" />
               <FormLabel className="text-foreground">Notable Lyrics</FormLabel>
             </div>
-            <FormDescription>
-              Share key lyrics that highlight the song's message or emotional impact.
-            </FormDescription>
             <FormControl>
               <div className="relative">
                 <Textarea
