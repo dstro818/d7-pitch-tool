@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -13,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Music2, X, Plus, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,15 +32,36 @@ interface ProductionSelectProps {
 
 export function ProductionSelect({ value, customElements, onChange }: ProductionSelectProps) {
   const [open, setOpen] = useState(false);
-  const [customInput, setCustomInput] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
+  const filteredElements = useMemo(() => {
+    if (!searchValue) return PRODUCTION_ELEMENTS;
+    return PRODUCTION_ELEMENTS.filter((element) =>
+      element.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [searchValue]);
+
   const handleSelect = (currentValue: ProductionElement) => {
-    setOpen(false);
-    if (!value.includes(currentValue)) {
-      onChange([...value, currentValue], customElements);
-      setSearchValue("");
+    if (!currentValue) return;
+    
+    const newValue = [...value];
+    const exists = newValue.includes(currentValue);
+
+    if (exists) {
+      onChange(newValue.filter((v) => v !== currentValue), customElements);
+    } else {
+      onChange([...newValue, currentValue], customElements);
     }
+
+    setSearchValue("");
+    setOpen(false);
+  };
+
+  const handleAddCustom = () => {
+    if (!searchValue.trim()) return;
+    onChange(value, [...customElements, searchValue.trim()]);
+    setSearchValue("");
+    setOpen(false);
   };
 
   const removeElement = (element: ProductionElement | string, e: React.MouseEvent) => {
@@ -61,21 +81,7 @@ export function ProductionSelect({ value, customElements, onChange }: Production
     }
   };
 
-  const addCustomElement = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (customInput.trim() && !customElements.includes(customInput.trim())) {
-      onChange(value, [...customElements, customInput.trim()]);
-      setCustomInput("");
-      setOpen(false);
-    }
-  };
-
   const allElements = [...value, ...customElements];
-  const filteredElements = PRODUCTION_ELEMENTS.filter((element) =>
-    element.toLowerCase().includes(searchValue.toLowerCase())
-  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -124,24 +130,20 @@ export function ProductionSelect({ value, customElements, onChange }: Production
             onValueChange={setSearchValue}
             className="text-foreground"
           />
-          <CommandEmpty className="text-foreground p-2">No element found.</CommandEmpty>
-          <CommandGroup className="max-h-[200px] overflow-y-auto">
-            <div className="flex items-center gap-2 p-2">
-              <Input
-                value={customInput}
-                onChange={(e) => setCustomInput(e.target.value)}
-                placeholder="Add custom element..."
-                className="h-8 text-foreground"
-              />
-              <Button 
-                size="sm"
-                onClick={addCustomElement}
+          <CommandEmpty className="text-foreground p-2">
+            {searchValue && (
+              <Button
+                onClick={handleAddCustom}
+                className="w-full justify-start"
+                variant="ghost"
                 type="button"
-                className="h-8"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" />
+                Add "{searchValue}"
               </Button>
-            </div>
+            )}
+          </CommandEmpty>
+          <CommandGroup className="max-h-[200px] overflow-y-auto">
             {filteredElements.map((element) => (
               <CommandItem
                 key={element}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -13,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Music, X, Plus, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,15 +35,34 @@ interface GenreSelectProps {
 
 export function GenreSelect({ value, onChange }: GenreSelectProps) {
   const [open, setOpen] = useState(false);
-  const [customInput, setCustomInput] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
+  const filteredGenres = useMemo(() => {
+    if (!searchValue) return GENRES;
+    return GENRES.filter((genre) =>
+      genre.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [searchValue]);
+
   const handleSelect = (currentValue: string) => {
-    setOpen(false);
-    if (value.length < 3 && !value.includes(currentValue)) {
-      onChange([...value, currentValue]);
-      setSearchValue("");
+    if (!currentValue) return;
+    
+    const newValue = [...value];
+    const exists = newValue.includes(currentValue);
+
+    if (exists) {
+      onChange(newValue.filter((v) => v !== currentValue));
+    } else if (newValue.length < 3) {
+      onChange([...newValue, currentValue]);
     }
+
+    setSearchValue("");
+    setOpen(false);
+  };
+
+  const handleAddCustom = () => {
+    if (!searchValue.trim() || value.length >= 3) return;
+    handleSelect(searchValue.trim());
   };
 
   const removeGenre = (genreToRemove: Genre, e: React.MouseEvent) => {
@@ -52,25 +70,6 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
     e.stopPropagation();
     onChange(value.filter((genre) => genre !== genreToRemove));
   };
-
-  const addCustomGenre = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (
-      customInput.trim() && 
-      !value.includes(customInput.trim()) && 
-      value.length < 3
-    ) {
-      onChange([...value, customInput.trim()]);
-      setCustomInput("");
-      setOpen(false);
-    }
-  };
-
-  const filteredGenres = GENRES.filter((genre) =>
-    genre.toLowerCase().includes(searchValue.toLowerCase())
-  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -88,8 +87,8 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
               {value.length > 0 ? (
                 value.map((genre) => (
                   <Badge
-                    key={genre} 
-                    variant="secondary" 
+                    key={genre}
+                    variant="secondary"
                     className="mr-1"
                   >
                     {genre}
@@ -119,25 +118,20 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
             onValueChange={setSearchValue}
             className="text-foreground"
           />
-          <CommandEmpty className="text-foreground p-2">No genre found.</CommandEmpty>
-          <CommandGroup className="max-h-[200px] overflow-y-auto">
-            <div className="flex items-center gap-2 p-2">
-              <Input
-                value={customInput}
-                onChange={(e) => setCustomInput(e.target.value)}
-                placeholder="Add custom genre..."
-                className="h-8 text-foreground"
-              />
-              <Button 
-                size="sm"
-                onClick={addCustomGenre}
-                disabled={value.length >= 3}
+          <CommandEmpty className="text-foreground p-2">
+            {searchValue && (
+              <Button
+                onClick={handleAddCustom}
+                className="w-full justify-start"
+                variant="ghost"
                 type="button"
-                className="h-8"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" />
+                Add "{searchValue}"
               </Button>
-            </div>
+            )}
+          </CommandEmpty>
+          <CommandGroup className="max-h-[200px] overflow-y-auto">
             {filteredGenres.map((genre) => (
               <CommandItem
                 key={genre}
