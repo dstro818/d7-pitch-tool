@@ -1,28 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
+import { ProductionElement, PRODUCTION_ELEMENTS } from "@/types/pitch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { Music2, X, Plus, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-export const PRODUCTION_ELEMENTS = [
-  "Guitar", "Piano", "Drums", "Bass", "Violin", "Saxophone",
-  "Synthesizer", "Trumpet", "Flute", "Cello", "Harmonica",
-  "Percussion", "Vocals", "Electronic elements"
-] as const;
-
-export type ProductionElement = (typeof PRODUCTION_ELEMENTS)[number];
+import { Plus } from "lucide-react";
 
 interface ProductionSelectProps {
   value: ProductionElement[];
@@ -35,139 +17,92 @@ export function ProductionSelect({
   customElements = [], 
   onChange 
 }: ProductionSelectProps) {
-  const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [customInput, setCustomInput] = React.useState("");
 
-  const filteredElements = useMemo(() => {
-    if (!searchValue) return PRODUCTION_ELEMENTS;
-    return PRODUCTION_ELEMENTS.filter((element) =>
-      element.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }, [searchValue]);
-
-  const handleSelect = (currentValue: ProductionElement) => {
-    const newValue = [...value];
-    const exists = newValue.includes(currentValue);
-
-    if (exists) {
-      onChange(newValue.filter((v) => v !== currentValue), customElements);
+  const handleProductionChange = (element: ProductionElement, checked: boolean) => {
+    if (checked) {
+      onChange([...value, element], customElements);
     } else {
-      onChange([...newValue, currentValue], customElements);
-      setOpen(false);
+      onChange(value.filter((e) => e !== element), customElements);
     }
   };
 
   const handleAddCustom = () => {
-    if (!searchValue.trim()) return;
-    const newCustomElement = searchValue.trim();
-    if (!customElements.includes(newCustomElement)) {
-      onChange(value, [...customElements, newCustomElement]);
-      setSearchValue("");
-      setOpen(false);
+    if (customInput.trim() && !customElements.includes(customInput.trim())) {
+      onChange(value, [...customElements, customInput.trim()]);
+      setCustomInput("");
     }
   };
 
-  const removeElement = (element: ProductionElement | string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (PRODUCTION_ELEMENTS.includes(element as ProductionElement)) {
-      onChange(
-        value.filter((v) => v !== element),
-        customElements
-      );
-    } else {
-      onChange(
-        value,
-        customElements.filter((c) => c !== element)
-      );
-    }
+  const handleRemoveCustom = (element: string) => {
+    onChange(value, customElements.filter((e) => e !== element));
   };
-
-  const allElements = [...value, ...customElements];
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between form-input-gradient text-foreground bg-popover hover:bg-accent/50"
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <Input
+          placeholder="Add custom production element..."
+          value={customInput}
+          onChange={(e) => setCustomInput(e.target.value)}
+          className="flex-1"
+        />
+        <Button 
           type="button"
+          variant="outline"
+          onClick={handleAddCustom}
+          disabled={!customInput.trim()}
         >
-          <div className="flex gap-2 items-center">
-            <Music2 className="h-4 w-4 shrink-0" />
-            <div className="flex flex-wrap gap-1">
-              {allElements.length > 0 ? (
-                allElements.map((element) => (
-                  <Badge
-                    key={element}
-                    variant="secondary"
-                    className="mr-1"
-                  >
-                    {element}
-                    <Button
-                      onClick={(e) => removeElement(element, e)}
-                      className="ml-1 h-auto p-0 hover:bg-transparent"
-                      variant="ghost"
-                      type="button"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))
-              ) : (
-                "Select production elements..."
-              )}
-            </div>
-          </div>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+          <Plus className="h-4 w-4" />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className="w-[var(--radix-popover-trigger-width)] p-0"
-        align="start"
-        side="bottom"
-        sideOffset={5}
-      >
-        <Command className="bg-popover border rounded-lg shadow-md">
-          <CommandInput 
-            placeholder="Search elements..." 
-            value={searchValue}
-            onValueChange={setSearchValue}
-            className="text-foreground"
-          />
-          <CommandEmpty className="text-foreground p-2">
-            {searchValue && (
-              <Button
-                onClick={handleAddCustom}
-                className="w-full justify-start"
-                variant="ghost"
-                type="button"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add "{searchValue}"
-              </Button>
-            )}
-          </CommandEmpty>
-          <CommandGroup className="max-h-[200px] overflow-y-auto">
-            {filteredElements.map((element) => (
-              <CommandItem
-                key={element}
-                value={element}
-                onSelect={() => handleSelect(element)}
-                className={cn(
-                  "cursor-pointer text-foreground hover:bg-accent",
-                  value.includes(element) && "opacity-50"
-                )}
+      </div>
+
+      {customElements.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium">Custom Elements</div>
+          <div className="grid grid-cols-2 gap-4">
+            {customElements.map((element) => (
+              <div key={element} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`custom-${element}`}
+                  checked={true}
+                  onCheckedChange={(checked) => {
+                    if (!checked) handleRemoveCustom(element);
+                  }}
+                />
+                <label
+                  htmlFor={`custom-${element}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {element}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+        <div className="grid grid-cols-2 gap-4">
+          {PRODUCTION_ELEMENTS.map((element) => (
+            <div key={element} className="flex items-center space-x-2">
+              <Checkbox
+                id={element}
+                checked={value.includes(element)}
+                onCheckedChange={(checked) => 
+                  handleProductionChange(element, checked as boolean)
+                }
+              />
+              <label
+                htmlFor={element}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 {element}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              </label>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
