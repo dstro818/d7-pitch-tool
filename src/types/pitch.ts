@@ -1,5 +1,4 @@
 export type Genre = string;
-export type ProductionElement = string;
 
 export interface PitchFormData {
   title: string;
@@ -7,7 +6,7 @@ export interface PitchFormData {
   genres: Genre[];
   theme: string;
   lyrics: string;
-  productionElements: ProductionElement[];
+  productionElements: (typeof import('@/components/PitchForm/ProductionSelect').PRODUCTION_ELEMENTS)[number][];
   customProductionElements: string[];
   artistBackground: string;
   targetPlaylist: string;
@@ -21,10 +20,4 @@ export const GENRES = [
   "Jazz", "K-Pop", "Latin", "Metal", "New Age", "Pop", "Pop/Rock", "R&B/Soul",
   "Reggae", "Reggaeton", "Regional Mexicano", "Rock", "Salsa", "Singer/Songwriter",
   "Soft Rock", "Soundtrack", "Spoken Word", "Techno", "World"
-];
-
-export const PRODUCTION_ELEMENTS = [
-  "Guitar", "Piano", "Drums", "Bass", "Violin", "Saxophone",
-  "Synthesizer", "Trumpet", "Flute", "Cello", "Harmonica",
-  "Percussion", "Vocals", "Electronic elements"
 ];

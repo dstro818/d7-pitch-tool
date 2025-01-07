@@ -23,7 +23,7 @@ export const PRODUCTION_ELEMENTS = [
   "Percussion", "Vocals", "Electronic elements"
 ] as const;
 
-export type ProductionElement = typeof PRODUCTION_ELEMENTS[number];
+export type ProductionElement = (typeof PRODUCTION_ELEMENTS)[number];
 
 interface ProductionSelectProps {
   value: ProductionElement[];
@@ -38,14 +38,13 @@ export function ProductionSelect({ value, customElements, onChange }: Production
   const handleSelect = (currentValue: ProductionElement) => {
     if (!value.includes(currentValue)) {
       onChange([...value, currentValue], customElements);
+      setOpen(false);
     }
   };
 
-  const removeElement = (element: ProductionElement | string, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const removeElement = (element: ProductionElement | string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     
     if (PRODUCTION_ELEMENTS.includes(element as ProductionElement)) {
       onChange(
@@ -60,15 +59,14 @@ export function ProductionSelect({ value, customElements, onChange }: Production
     }
   };
 
-  const addCustomElement = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const addCustomElement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     
     if (customInput.trim() && !customElements.includes(customInput.trim())) {
       onChange(value, [...customElements, customInput.trim()]);
       setCustomInput("");
+      setOpen(false);
     }
   };
 
@@ -83,10 +81,6 @@ export function ProductionSelect({ value, customElements, onChange }: Production
           aria-expanded={open}
           className="w-full justify-between"
           type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            setOpen(!open);
-          }}
         >
           <div className="flex gap-2 items-center">
             <Music2 className="h-4 w-4 shrink-0" />
@@ -96,16 +90,17 @@ export function ProductionSelect({ value, customElements, onChange }: Production
                   <Badge
                     key={element}
                     variant="secondary"
-                    className="mr-1 cursor-pointer hover:bg-secondary/80"
+                    className="mr-1"
                   >
                     {element}
-                    <button
+                    <Button
                       onClick={(e) => removeElement(element, e)}
-                      className="ml-1 hover:bg-secondary/80 rounded-full"
+                      className="ml-1 h-auto p-0 hover:bg-transparent"
+                      variant="ghost"
                       type="button"
                     >
                       <X className="h-3 w-3" />
-                    </button>
+                    </Button>
                   </Badge>
                 ))
               ) : (
@@ -130,7 +125,7 @@ export function ProductionSelect({ value, customElements, onChange }: Production
               />
               <Button 
                 size="sm"
-                onClick={(e) => addCustomElement(e)}
+                onClick={addCustomElement}
                 type="button"
                 className="h-8"
               >
