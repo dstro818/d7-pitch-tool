@@ -27,7 +27,7 @@ export const GENRES = [
   "Soft Rock", "Soundtrack", "Spoken Word", "Techno", "World"
 ] as const;
 
-export type Genre = typeof GENRES[number] | string;
+export type Genre = (typeof GENRES)[number] | string;
 
 interface GenreSelectProps {
   value: Genre[];
@@ -41,22 +41,19 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
   const handleSelect = (currentValue: string) => {
     if (value.length < 3 && !value.includes(currentValue)) {
       onChange([...value, currentValue]);
+      setOpen(false);
     }
   };
 
-  const removeGenre = (genreToRemove: Genre, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const removeGenre = (genreToRemove: Genre, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     onChange(value.filter((genre) => genre !== genreToRemove));
   };
 
-  const addCustomGenre = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const addCustomGenre = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     
     if (
       customInput.trim() && 
@@ -65,6 +62,7 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
     ) {
       onChange([...value, customInput.trim()]);
       setCustomInput("");
+      setOpen(false);
     }
   };
 
@@ -77,10 +75,6 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
           aria-expanded={open}
           className="w-full justify-between"
           type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            setOpen(!open);
-          }}
         >
           <div className="flex gap-2 items-center">
             <Music className="h-4 w-4 shrink-0" />
@@ -90,16 +84,17 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
                   <Badge
                     key={genre} 
                     variant="secondary" 
-                    className="mr-1 cursor-pointer hover:bg-secondary/80"
+                    className="mr-1"
                   >
                     {genre}
-                    <button
+                    <Button
                       onClick={(e) => removeGenre(genre, e)}
-                      className="ml-1 hover:bg-secondary/80 rounded-full"
+                      className="ml-1 h-auto p-0 hover:bg-transparent"
+                      variant="ghost"
                       type="button"
                     >
                       <X className="h-3 w-3" />
-                    </button>
+                    </Button>
                   </Badge>
                 ))
               ) : (
@@ -124,7 +119,7 @@ export function GenreSelect({ value, onChange }: GenreSelectProps) {
               />
               <Button 
                 size="sm"
-                onClick={(e) => addCustomGenre(e)}
+                onClick={addCustomGenre}
                 disabled={value.length >= 3}
                 type="button"
                 className="h-8"
