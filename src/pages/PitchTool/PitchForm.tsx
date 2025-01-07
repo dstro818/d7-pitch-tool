@@ -59,6 +59,10 @@ export function PitchForm() {
     }
   };
 
+  const handleRegenerate = (suggestions?: string) => {
+    generateAIPitch(formValues, suggestions);
+  };
+
   const onSubmit = async (data: PitchFormData) => {
     try {
       const { error } = await supabase
