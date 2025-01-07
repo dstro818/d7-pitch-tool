@@ -12,9 +12,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Using a valid UUID format for development
+const DEVELOPMENT_USER_ID = '00000000-0000-0000-0000-000000000000';
+
 export function PitchForm() {
   const { toast } = useToast();
-  const [userId] = useState('development-user'); // Fixed development user ID
+  const [userId] = useState(DEVELOPMENT_USER_ID);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
