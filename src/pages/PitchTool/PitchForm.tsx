@@ -14,6 +14,7 @@ export function PitchForm() {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [generatedTheme, setGeneratedTheme] = useState<string>("");
   
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -51,7 +52,7 @@ export function PitchForm() {
       if (error) throw error;
 
       if (response?.suggestion) {
-        form.setValue('theme', response.suggestion);
+        setGeneratedTheme(response.suggestion);
         return response.suggestion;
       }
     } catch (error) {
@@ -135,7 +136,7 @@ export function PitchForm() {
 
       <div className="lg:sticky lg:top-6 h-fit">
         <PitchPreview 
-          data={formValues} 
+          data={{ ...formValues, theme: generatedTheme }}
           onRegenerate={generateAIPitch}
           isGenerating={isGenerating}
         />
