@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PitchFormData } from "@/types/pitch";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
 
 export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (data: PitchFormData, suggestions?: string) => void) {
   const { toast } = useToast();
@@ -42,8 +43,8 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
       parts.push(data.artist_background);
     }
     
-    const text = parts.join(' ');
-    return text.slice(0, 500);
+    const text = parts.join('\n\n');
+    return text;
   };
 
   const handleCopy = async () => {
@@ -63,17 +64,27 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   };
 
   const handleExport = () => {
-    const element = document.createElement("a");
-    const file = new Blob([formatPitchText()], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = "pitch.txt";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    const doc = new jsPDF();
+    const text = formatPitchText();
+    const splitText = doc.splitTextToSize(text, 180);
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text("Pitch Document", 105, 20, { align: "center" });
+    
+    // Add content
+    doc.setFontSize(12);
+    doc.text(splitText, 15, 40);
+    
+    // Add footer with date
+    doc.setFontSize(10);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, 15, 280);
+    
+    doc.save("pitch.pdf");
     
     toast({
       title: "Exported!",
-      description: "Pitch exported as text file",
+      description: "Pitch exported as PDF",
     });
   };
 

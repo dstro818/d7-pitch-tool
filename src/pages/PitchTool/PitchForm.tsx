@@ -8,24 +8,13 @@ import { ContentFields } from "./form-sections/ContentFields";
 import { ProductionFields } from "./form-sections/ProductionFields";
 import { PitchPreview } from "@/components/PitchForm/PitchPreview";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export function PitchForm() {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const [generatedTheme, setGeneratedTheme] = useState<string>("");
   
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      }
-    };
-    getCurrentUser();
-  }, []);
-
   const form = useForm<PitchFormData>({
     defaultValues: {
       title: "",
@@ -69,15 +58,6 @@ export function PitchForm() {
   };
 
   const onSubmit = async (data: PitchFormData) => {
-    if (!userId) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to create a pitch.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       // Generate the AI pitch first, just like regenerate button
       await generateAIPitch(data);
@@ -87,8 +67,7 @@ export function PitchForm() {
         .from('pitches')
         .insert({
           ...data,
-          theme: generatedTheme, // Use the generated theme
-          user_id: userId
+          theme: generatedTheme,
         });
 
       if (error) throw error;
@@ -123,7 +102,7 @@ export function PitchForm() {
           <Button
             type="submit"
             className="w-full neon-border hover-glow"
-            disabled={isGenerating || !userId}
+            disabled={isGenerating}
           >
             {isGenerating ? 'Generating...' : 'Create Pitch'}
           </Button>
