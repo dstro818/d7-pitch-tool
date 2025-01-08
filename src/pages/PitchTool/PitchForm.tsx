@@ -79,7 +79,12 @@ export function PitchForm() {
       return;
     }
 
+    setIsGenerating(true);
     try {
+      // First generate the AI pitch
+      await generateAIPitch(data);
+      
+      // Then save to database
       const { error } = await supabase
         .from('pitches')
         .insert({
@@ -93,9 +98,6 @@ export function PitchForm() {
         title: "Success!",
         description: "Your pitch has been created.",
       });
-
-      // Generate AI pitch after saving
-      await generateAIPitch(data);
     } catch (error) {
       console.error('Error saving pitch:', error);
       toast({
@@ -103,6 +105,8 @@ export function PitchForm() {
         description: "Failed to create pitch. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -124,7 +128,7 @@ export function PitchForm() {
             className="w-full neon-border hover-glow"
             disabled={isGenerating || !userId}
           >
-            Create Pitch
+            {isGenerating ? 'Generating...' : 'Create Pitch'}
           </Button>
         </form>
       </Form>

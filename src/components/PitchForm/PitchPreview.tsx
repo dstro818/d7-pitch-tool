@@ -161,16 +161,8 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
             )}
           </div>
         )}
-        {showPreview && hasGeneratedPitch && !isGenerating && (
-          <PitchSuggestions
-            value={suggestions}
-            onChange={setSuggestions}
-            onSend={handleSendSuggestions}
-            isGenerating={isGenerating}
-          />
-        )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-4">
         <PitchActions
           onRegenerate={handleRegenerate}
           onCopy={handleCopy}
@@ -178,6 +170,19 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
           isGenerating={isGenerating}
           showPreview={showPreview}
         />
+        
+        {showPreview && hasGeneratedPitch && !isGenerating && (
+          <Card className="w-full border border-primary/20 bg-primary/5">
+            <CardContent className="pt-6">
+              <PitchSuggestions
+                value={suggestions}
+                onChange={setSuggestions}
+                onSend={handleSendSuggestions}
+                isGenerating={isGenerating}
+              />
+            </CardContent>
+          </Card>
+        )}
       </CardFooter>
     </Card>
   );
