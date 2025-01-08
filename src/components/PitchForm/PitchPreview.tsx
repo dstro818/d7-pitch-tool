@@ -3,9 +3,8 @@ import { PitchFormData } from "@/types/pitch";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { PitchSuggestions } from "./PitchSuggestions";
-import { PitchActions } from "./PitchActions";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PreviewContent } from "./PreviewContent";
+import { PreviewFooter } from "./PreviewFooter";
 
 interface PitchPreviewProps {
   data: Partial<PitchFormData>;
@@ -13,7 +12,7 @@ interface PitchPreviewProps {
   isGenerating?: boolean;
 }
 
-export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewProps) {
+export function PitchPreview({ data, onRegenerate, isGenerating = false }: PitchPreviewProps) {
   const { toast } = useToast();
   const [suggestions, setSuggestions] = useState("");
   const [hasGeneratedPitch, setHasGeneratedPitch] = useState(false);
@@ -21,7 +20,6 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
   const formatPitchText = () => {
     const parts = [];
     
-    // Title and Artists Section
     if (data.title) {
       if (data.artists) {
         parts.push(`${data.title} - ${data.artists}`);
@@ -30,17 +28,15 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
       }
     }
     
-    // Genre Section - without brackets
     if (data.genres && data.genres.length > 0) {
       parts.push(data.genres.join(', '));
     }
     
-    // Main Description
-    if (data.theme) {
+    // Only include AI-generated theme in preview, not the user's input theme
+    if (data.theme && hasGeneratedPitch) {
       parts.push(data.theme);
     }
     
-    // Production Elements
     if (data.production_elements?.length > 0 || data.custom_production_elements?.length > 0) {
       const elements = [...(data.production_elements || []), ...(data.custom_production_elements || [])];
       if (elements.length > 0) {
@@ -48,28 +44,21 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
       }
     }
     
-    // Notable Lyrics
     if (data.lyrics) {
       parts.push(`Notable lyrics: "${data.lyrics}"`);
     }
     
-    // Artist Background
     if (data.artist_background) {
       parts.push(data.artist_background);
     }
     
     const text = parts.join(' ');
-    return text.slice(0, 500); // Enforce 500 character limit
+    return text.slice(0, 500);
   };
-
-  const pitchText = formatPitchText();
-  const characterCount = pitchText.length;
-  const isOverLimit = characterCount > 500;
-  const showPreview = characterCount > 0;
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(pitchText);
+      await navigator.clipboard.writeText(formatPitchText());
       toast({
         title: "Copied!",
         description: "Pitch text copied to clipboard",
@@ -85,7 +74,7 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
 
   const handleExport = () => {
     const element = document.createElement("a");
-    const file = new Blob([pitchText], {type: 'text/plain'});
+    const file = new Blob([formatPitchText()], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
     element.download = "pitch.txt";
     document.body.appendChild(element);
@@ -118,7 +107,7 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
     if (onRegenerate && suggestions.trim() && data as PitchFormData) {
       try {
         await onRegenerate(data as PitchFormData, suggestions);
-        setSuggestions(""); // Clear suggestions after sending
+        setSuggestions("");
       } catch (error) {
         console.error('Error sending suggestions:', error);
         toast({
@@ -130,6 +119,8 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
     }
   };
 
+  const showPreview = formatPitchText().length > 0;
+
   return (
     <Card className="w-full glass-card border-white/10">
       <CardHeader>
@@ -138,51 +129,25 @@ export function PitchPreview({ data, onRegenerate, isGenerating }: PitchPreviewP
           Pitch Preview
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {isGenerating ? (
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-4 w-2/3" />
-          </div>
-        ) : (
-          <div className="text-muted-foreground">
-            {showPreview ? (
-              <>
-                {pitchText}
-                <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {characterCount}/500 characters
-                </div>
-              </>
-            ) : (
-              <span className="text-muted-foreground/50 italic">
-                Start typing to see your pitch preview...
-              </span>
-            )}
-          </div>
-        )}
+      <CardContent>
+        <PreviewContent
+          data={data}
+          isGenerating={isGenerating}
+          formatPitchText={formatPitchText}
+        />
       </CardContent>
-      <CardFooter className="flex flex-col gap-4">
-        <PitchActions
+      <CardFooter>
+        <PreviewFooter
+          showPreview={showPreview}
+          hasGeneratedPitch={hasGeneratedPitch}
+          isGenerating={isGenerating}
+          suggestions={suggestions}
+          setSuggestions={setSuggestions}
           onRegenerate={handleRegenerate}
           onCopy={handleCopy}
           onExport={handleExport}
-          isGenerating={isGenerating}
-          showPreview={showPreview}
+          onSendSuggestions={handleSendSuggestions}
         />
-        
-        {showPreview && hasGeneratedPitch && !isGenerating && (
-          <Card className="w-full border border-primary/20 bg-primary/5">
-            <CardContent className="pt-6">
-              <PitchSuggestions
-                value={suggestions}
-                onChange={setSuggestions}
-                onSend={handleSendSuggestions}
-                isGenerating={isGenerating}
-              />
-            </CardContent>
-          </Card>
-        )}
       </CardFooter>
     </Card>
   );
