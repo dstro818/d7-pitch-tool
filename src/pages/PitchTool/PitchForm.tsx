@@ -111,6 +111,9 @@ export function PitchForm() {
     }
   };
 
+  // Check if form has required fields filled
+  const isFormValid = formValues.title && formValues.artists;
+
   return (
     <div className="grid lg:grid-cols-2 gap-6">
       <Form {...form}>
@@ -127,7 +130,7 @@ export function PitchForm() {
           <Button
             type="submit"
             className="w-full neon-border hover-glow"
-            disabled={isGenerating || !userId}
+            disabled={isGenerating || !userId || !isFormValid}
           >
             {isGenerating ? 'Generating...' : 'Create Pitch'}
           </Button>
