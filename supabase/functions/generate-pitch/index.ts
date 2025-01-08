@@ -9,23 +9,25 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const formData = await req.json();
-    
+    const { title, artists, genres, theme, production_elements, custom_production_elements, lyrics, artist_background, target_playlist, suggestions } = await req.json();
+
     // Create a structured prompt for OpenAI
     let prompt = `Generate a compelling music pitch under 500 characters using this information:
-    Title: ${formData.title}
-    Artists: ${formData.artists}
-    Genres: ${formData.genres?.join(', ')}
-    Theme: ${formData.theme || ''}
-    Production Elements: ${[...(formData.production_elements || []), ...(formData.custom_production_elements || [])].join(', ')}
-    Lyrics: ${formData.lyrics || ''}
-    Artist Background: ${formData.artist_background || ''}
-    Target Playlist: ${formData.target_playlist || ''}
+    Title: ${title}
+    Artists: ${artists}
+    Genres: ${genres?.join(', ')}
+    Theme: ${theme || ''}
+    Production Elements: ${[...(production_elements || []), ...(custom_production_elements || [])].join(', ')}
+    Lyrics: ${lyrics || ''}
+    Artist Background: ${artist_background || ''}
+    Target Playlist: ${target_playlist || ''}
+    ${suggestions ? `Additional suggestions: ${suggestions}` : ''}
 
     Format the pitch like this example:
     "Song Title - Artist Name, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
@@ -36,6 +38,8 @@ serve(async (req) => {
     3. Only include sections that have content
     4. Make it flow naturally like a paragraph
     5. Keep the original information but make it more engaging`;
+
+    console.log('Sending request to OpenAI with prompt:', prompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -60,6 +64,12 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    console.log('OpenAI response:', data);
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI');
+    }
+
     const suggestion = data.choices[0].message.content.slice(0, 500);
 
     return new Response(
