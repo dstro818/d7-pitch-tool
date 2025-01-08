@@ -77,11 +77,14 @@ export function PitchForm() {
       return;
     }
 
-    setIsGenerating(true);
     try {
       // First generate the AI pitch
       const theme = await generateAIPitch(data);
       
+      if (!theme) {
+        throw new Error("Failed to generate pitch theme");
+      }
+
       // Then save to database with the generated theme and user_id
       const { error } = await supabase
         .from('pitches')
@@ -104,8 +107,6 @@ export function PitchForm() {
         description: "Failed to create pitch. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsGenerating(false);
     }
   };
 
