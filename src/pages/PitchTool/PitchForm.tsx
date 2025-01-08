@@ -79,19 +79,15 @@ export function PitchForm() {
     }
 
     try {
-      // First generate the AI pitch
-      const theme = await generateAIPitch(data);
+      // Generate the AI pitch first, just like regenerate button
+      await generateAIPitch(data);
       
-      if (!theme) {
-        throw new Error("Failed to generate pitch theme");
-      }
-
-      // Then save to database with the generated theme and user_id
+      // Then save to database with the generated theme
       const { error } = await supabase
         .from('pitches')
         .insert({
           ...data,
-          theme,
+          theme: generatedTheme, // Use the generated theme
           user_id: userId
         });
 
@@ -111,9 +107,6 @@ export function PitchForm() {
     }
   };
 
-  // Check if form has required fields filled
-  const isFormValid = formValues.title && formValues.artists;
-
   return (
     <div className="grid lg:grid-cols-2 gap-6">
       <Form {...form}>
@@ -130,7 +123,7 @@ export function PitchForm() {
           <Button
             type="submit"
             className="w-full neon-border hover-glow"
-            disabled={isGenerating || !userId || !isFormValid}
+            disabled={isGenerating || !userId}
           >
             {isGenerating ? 'Generating...' : 'Create Pitch'}
           </Button>
