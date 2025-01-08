@@ -8,12 +8,23 @@ import { ContentFields } from "./form-sections/ContentFields";
 import { ProductionFields } from "./form-sections/ProductionFields";
 import { PitchPreview } from "@/components/PitchForm/PitchPreview";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function PitchForm() {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getCurrentUser();
+  }, []);
+
   const form = useForm<PitchFormData>({
     defaultValues: {
       title: "",
@@ -59,10 +70,22 @@ export function PitchForm() {
   };
 
   const onSubmit = async (data: PitchFormData) => {
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create a pitch.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('pitches')
-        .insert(data);
+        .insert({
+          ...data,
+          user_id: userId
+        });
 
       if (error) throw error;
 
@@ -99,7 +122,7 @@ export function PitchForm() {
           <Button
             type="submit"
             className="w-full neon-border hover-glow"
-            disabled={isGenerating}
+            disabled={isGenerating || !userId}
           >
             Create Pitch
           </Button>
