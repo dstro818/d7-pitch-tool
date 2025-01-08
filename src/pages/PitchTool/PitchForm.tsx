@@ -82,7 +82,7 @@ export function PitchForm() {
       // First generate the AI pitch
       const theme = await generateAIPitch(data);
       
-      // Then save to database with the generated theme
+      // Then save to database with the generated theme and user_id
       const { error } = await supabase
         .from('pitches')
         .insert({
