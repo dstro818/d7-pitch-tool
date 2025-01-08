@@ -27,7 +27,7 @@ export function PreviewFooter({
   onSendSuggestions,
 }: PreviewFooterProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 w-full">
       <PitchActions
         onRegenerate={onRegenerate}
         onCopy={onCopy}
@@ -37,7 +37,7 @@ export function PreviewFooter({
       />
       
       {showPreview && hasGeneratedPitch && !isGenerating && (
-        <Card className="w-full border border-primary/20 bg-primary/5">
+        <Card className="w-full border-primary/20 bg-primary/5 shadow-lg">
           <CardContent className="pt-6">
             <PitchSuggestions
               value={suggestions}

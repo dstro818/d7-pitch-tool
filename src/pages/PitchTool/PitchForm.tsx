@@ -52,10 +52,7 @@ export function PitchForm() {
 
       if (response?.suggestion) {
         form.setValue('theme', response.suggestion);
-        toast({
-          title: "AI Pitch Generated",
-          description: "Your pitch has been generated successfully.",
-        });
+        return response.suggestion;
       }
     } catch (error) {
       console.error('Error generating pitch:', error);
@@ -64,6 +61,7 @@ export function PitchForm() {
         description: "Failed to generate pitch. Please try again.",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsGenerating(false);
     }
@@ -82,13 +80,14 @@ export function PitchForm() {
     setIsGenerating(true);
     try {
       // First generate the AI pitch
-      await generateAIPitch(data);
+      const theme = await generateAIPitch(data);
       
-      // Then save to database
+      // Then save to database with the generated theme
       const { error } = await supabase
         .from('pitches')
         .insert({
           ...data,
+          theme,
           user_id: userId
         });
 
