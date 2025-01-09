@@ -41,6 +41,12 @@ export function PitchForm() {
       if (error) throw error;
 
       if (response?.suggestion) {
+        // Validate character count
+        if (response.suggestion.length > 500) {
+          const truncated = response.suggestion.slice(0, 497) + "...";
+          setGeneratedTheme(truncated);
+          return truncated;
+        }
         setGeneratedTheme(response.suggestion);
         return response.suggestion;
       }
@@ -59,15 +65,24 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
-      // Generate the AI pitch first, just like regenerate button
-      await generateAIPitch(data);
+      // First generate the AI pitch
+      const generatedPitch = await generateAIPitch(data);
       
+      if (!generatedPitch) {
+        toast({
+          title: "Error",
+          description: "Failed to generate pitch content. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Then save to database with the generated theme
       const { error } = await supabase
         .from('pitches')
         .insert({
           ...data,
-          theme: generatedTheme,
+          theme: generatedPitch,
         });
 
       if (error) throw error;
