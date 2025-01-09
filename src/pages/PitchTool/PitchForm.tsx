@@ -65,6 +65,8 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
+      setIsGenerating(true);
+      
       // First generate the AI pitch
       const generatedPitch = await generateAIPitch(data);
       
@@ -77,7 +79,7 @@ export function PitchForm() {
         return;
       }
 
-      // Then save to database with the generated theme
+      // Then save to database with the generated pitch
       const { error } = await supabase
         .from('pitches')
         .insert({
@@ -98,6 +100,8 @@ export function PitchForm() {
         description: "Failed to create pitch. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
