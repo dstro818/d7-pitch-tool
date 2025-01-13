@@ -10,9 +10,7 @@ interface PreviewContentProps {
 
 export function PreviewContent({ data, isGenerating, formatPitchText }: PreviewContentProps) {
   const pitchText = formatPitchText();
-  const truncatedText = pitchText.slice(0, 500);
   const characterCount = isGenerating ? 0 : pitchText.length;
-  const isOverLimit = characterCount > 500;
 
   const showPreview = characterCount > 0;
 
@@ -33,9 +31,9 @@ export function PreviewContent({ data, isGenerating, formatPitchText }: PreviewC
     <div className="text-muted-foreground">
       {showPreview ? (
         <>
-          {isOverLimit ? truncatedText : pitchText}
-          <div className={`text-xs mt-2 ${isOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
-            {characterCount}/500 characters {isOverLimit && '(truncated)'}
+          {pitchText}
+          <div className="text-xs mt-2 text-muted-foreground">
+            {characterCount}/500 characters
           </div>
         </>
       ) : (

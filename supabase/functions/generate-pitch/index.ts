@@ -9,7 +9,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,8 +16,7 @@ serve(async (req) => {
   try {
     const { title, artists, genres, theme, production_elements, custom_production_elements, lyrics, artist_background, target_playlist, suggestions } = await req.json();
 
-    // Create a structured prompt for OpenAI
-    let prompt = `Generate a compelling music pitch under 500 characters using this information:
+    let prompt = `Generate a compelling music pitch EXACTLY 500 characters or less using this information:
     Title: ${title}
     Artists: ${artists}
     Genres: ${genres?.join(', ')}
@@ -33,11 +31,10 @@ serve(async (req) => {
     "Song Title - Artist Name, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
 
     Important rules:
-    1. Keep it under 500 characters
+    1. Response MUST be EXACTLY 500 characters or less
     2. Don't use brackets for genres
     3. Only include sections that have content
-    4. Make it flow naturally like a paragraph
-    5. Keep the original information but make it more engaging`;
+    4. Make it flow naturally like a paragraph`;
 
     console.log('Sending request to OpenAI with prompt:', prompt);
 
@@ -52,13 +49,14 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music industry expert that creates compelling and concise song pitches.'
+            content: 'You are a music industry expert that creates compelling and concise song pitches. Always ensure your response is exactly 500 characters or less.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
+        max_tokens: 500,
         temperature: 0.7,
       }),
     });
@@ -70,7 +68,7 @@ serve(async (req) => {
       throw new Error('Invalid response from OpenAI');
     }
 
-    const suggestion = data.choices[0].message.content.slice(0, 500);
+    const suggestion = data.choices[0].message.content;
 
     return new Response(
       JSON.stringify({ suggestion }),
