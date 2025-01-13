@@ -11,7 +11,7 @@ interface PreviewContentProps {
 export function PreviewContent({ data, isGenerating, formatPitchText }: PreviewContentProps) {
   const pitchText = formatPitchText();
   const truncatedText = pitchText.slice(0, 500);
-  const characterCount = pitchText.length;
+  const characterCount = isGenerating ? 0 : pitchText.length;
   const isOverLimit = characterCount > 500;
 
   const showPreview = characterCount > 0;
@@ -22,6 +22,9 @@ export function PreviewContent({ data, isGenerating, formatPitchText }: PreviewC
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
         <Skeleton className="h-4 w-2/3" />
+        <div className="text-xs mt-2 text-muted-foreground">
+          Generating pitch...
+        </div>
       </div>
     );
   }
