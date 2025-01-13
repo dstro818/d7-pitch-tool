@@ -24,8 +24,10 @@ export function PitchPreview({ data, onRegenerate, isGenerating = false }: Pitch
     handleSendSuggestions,
   } = usePitchPreview(data, onRegenerate);
 
-  // Only show the preview if we're generating or have generated content
-  if (!isGenerating && !hasGeneratedPitch) {
+  // Show preview if we're generating or have generated content
+  const showPreview = isGenerating || hasGeneratedPitch;
+  
+  if (!showPreview) {
     return null;
   }
 
