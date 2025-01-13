@@ -10,40 +10,12 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
 
   const formatPitchText = () => {
     // Only show content if we have a generated pitch
-    if (!hasGeneratedPitch) {
+    if (!hasGeneratedPitch || !data.theme) {
       return "";
     }
 
-    const parts = [];
-    
-    if (data.title && data.artists) {
-      parts.push(`${data.title} - ${data.artists}`);
-    }
-    
-    if (data.genres && data.genres.length > 0) {
-      parts.push(data.genres.join(', '));
-    }
-    
-    if (data.theme) {
-      parts.push(data.theme);
-    }
-    
-    if (data.production_elements?.length > 0 || data.custom_production_elements?.length > 0) {
-      const elements = [...(data.production_elements || []), ...(data.custom_production_elements || [])];
-      if (elements.length > 0) {
-        parts.push(`Featuring ${elements.join(', ')}.`);
-      }
-    }
-    
-    if (data.lyrics) {
-      parts.push(`Notable lyrics: "${data.lyrics}"`);
-    }
-    
-    if (data.artist_background) {
-      parts.push(data.artist_background);
-    }
-    
-    return parts.join('\n\n');
+    // When we have a generated pitch, only show the theme
+    return data.theme;
   };
 
   const handleCopy = async () => {
