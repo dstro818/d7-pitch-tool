@@ -24,7 +24,10 @@ export function PitchPreview({ data, onRegenerate, isGenerating = false }: Pitch
     handleSendSuggestions,
   } = usePitchPreview(data, onRegenerate);
 
-  const showPreview = formatPitchText().length > 0;
+  // Only show the preview if we're generating or have generated content
+  if (!isGenerating && !hasGeneratedPitch) {
+    return null;
+  }
 
   return (
     <Card className="w-full glass-card border-white/10">
@@ -43,7 +46,7 @@ export function PitchPreview({ data, onRegenerate, isGenerating = false }: Pitch
       </CardContent>
       <CardFooter>
         <PreviewFooter
-          showPreview={showPreview}
+          showPreview={formatPitchText().length > 0}
           hasGeneratedPitch={hasGeneratedPitch}
           isGenerating={isGenerating}
           suggestions={suggestions}
