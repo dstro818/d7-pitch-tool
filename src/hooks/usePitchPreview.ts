@@ -9,22 +9,22 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   const [hasGeneratedPitch, setHasGeneratedPitch] = useState(false);
 
   const formatPitchText = () => {
+    // Only show content if we have a generated pitch
+    if (!hasGeneratedPitch) {
+      return "";
+    }
+
     const parts = [];
     
-    if (data.title) {
-      if (data.artists) {
-        parts.push(`${data.title} - ${data.artists}`);
-      } else {
-        parts.push(data.title);
-      }
+    if (data.title && data.artists) {
+      parts.push(`${data.title} - ${data.artists}`);
     }
     
     if (data.genres && data.genres.length > 0) {
       parts.push(data.genres.join(', '));
     }
     
-    // Only include AI-generated theme in preview
-    if (data.theme && hasGeneratedPitch) {
+    if (data.theme) {
       parts.push(data.theme);
     }
     
@@ -43,8 +43,7 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
       parts.push(data.artist_background);
     }
     
-    const text = parts.join('\n\n');
-    return text;
+    return parts.join('\n\n');
   };
 
   const handleCopy = async () => {
@@ -68,15 +67,12 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
     const text = formatPitchText();
     const splitText = doc.splitTextToSize(text, 180);
     
-    // Add title
     doc.setFontSize(20);
     doc.text("Pitch Document", 105, 20, { align: "center" });
     
-    // Add content
     doc.setFontSize(12);
     doc.text(splitText, 15, 40);
     
-    // Add footer with date
     doc.setFontSize(10);
     doc.text(`Generated on ${new Date().toLocaleDateString()}`, 15, 280);
     
@@ -91,6 +87,7 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   const handleRegenerate = async () => {
     if (onRegenerate && data as PitchFormData) {
       try {
+        setHasGeneratedPitch(false); // Reset the flag before generating
         await onRegenerate(data as PitchFormData, suggestions);
         setHasGeneratedPitch(true);
       } catch (error) {
@@ -107,8 +104,10 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   const handleSendSuggestions = async () => {
     if (onRegenerate && suggestions.trim() && data as PitchFormData) {
       try {
+        setHasGeneratedPitch(false); // Reset the flag before generating
         await onRegenerate(data as PitchFormData, suggestions);
         setSuggestions("");
+        setHasGeneratedPitch(true);
       } catch (error) {
         console.error('Error sending suggestions:', error);
         toast({
