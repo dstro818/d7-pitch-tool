@@ -123,7 +123,7 @@ export function PitchForm() {
             className="w-full neon-border hover-glow"
             disabled={isGenerating}
           >
-            {isGenerating ? 'Generating...' : 'Create Pitch'}
+            {isGenerating ? 'Generating...' : 'Generate Pitch'}
           </Button>
         </form>
       </Form>
