@@ -65,7 +65,6 @@ export function PitchForm() {
 
   const onSubmit = async (data: PitchFormData) => {
     try {
-      // Generate the pitch first
       const generatedPitch = await generateAIPitch(data);
       
       if (!generatedPitch) {
