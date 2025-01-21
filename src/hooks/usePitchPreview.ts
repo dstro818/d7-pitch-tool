@@ -57,7 +57,6 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
     if (onRegenerate && data as PitchFormData) {
       try {
         await onRegenerate(data as PitchFormData, suggestions);
-        setHasGeneratedPitch(true);
       } catch (error) {
         console.error('Error regenerating pitch:', error);
         toast({
@@ -74,7 +73,6 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
       try {
         await onRegenerate(data as PitchFormData, suggestions);
         setSuggestions("");
-        setHasGeneratedPitch(true);
       } catch (error) {
         console.error('Error sending suggestions:', error);
         toast({
