@@ -17,7 +17,7 @@ serve(async (req) => {
     const { title, artists, genres, theme, production_elements, custom_production_elements, lyrics, artist_background, target_playlist, suggestions } = await req.json();
 
     const formattedTitle = `"${title}" by ${artists}`;
-
+    
     let prompt = `Generate a compelling music pitch that is EXACTLY 500 characters using this information:
     Title: ${formattedTitle}
     Genres: ${genres?.join(', ')}
@@ -28,15 +28,16 @@ serve(async (req) => {
     Target Playlist: ${target_playlist || ''}
     ${suggestions ? `Additional suggestions: ${suggestions}` : ''}
 
-    Important rules:
-    1. The pitch MUST be EXACTLY 500 characters
-    2. End with a complete sentence - no ellipsis or truncated words
-    3. Include all relevant information in a natural, flowing paragraph
-    4. Focus on the most compelling aspects of the song and artist
-    5. Make sure the last sentence is complete and impactful
+    Critical Requirements:
+    1. The pitch MUST be EXACTLY 500 characters - no more, no less
+    2. End with a complete sentence - never end mid-sentence or with "..."
+    3. Include the most compelling aspects of the song and artist
+    4. Format as a single flowing paragraph
+    5. Ensure the final sentence provides a strong conclusion about playlist fit or impact
+    6. If needed, adjust content to fit exactly 500 characters while maintaining complete thoughts
 
-    Example format:
-    "${title}" by ${artists} combines [genres] in this [theme description]. Featuring [production elements], this track [describe impact]. Notable lyrics: "[key lyrics]". [Artist background if relevant]. Perfect for [target playlist].`;
+    Example of a good 500-character pitch:
+    "Summer Nights" by The Dreamers blends Electronic and Pop into an enchanting summer anthem. With pulsing synths and dynamic percussion, this track captures the essence of warm evenings and endless possibilities. The chorus "Under starlit skies" resonates with dreamy vocals and atmospheric production. Drawing from their coastal roots, The Dreamers infuse authentic beach vibes into every note. This energetic yet laid-back track is perfect for Summer Hits playlists.`;
 
     console.log('Sending request to OpenAI with prompt:', prompt);
 
@@ -51,7 +52,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music industry expert that creates compelling and concise song pitches. Always ensure your response is exactly 500 characters with complete sentences.'
+            content: 'You are a music industry expert that creates compelling and concise song pitches. Always ensure your response is exactly 500 characters with complete sentences and never ends mid-thought.'
           },
           {
             role: 'user',
@@ -69,7 +70,16 @@ serve(async (req) => {
       throw new Error('Invalid response from OpenAI');
     }
 
-    const suggestion = data.choices[0].message.content;
+    const suggestion = data.choices[0].message.content.trim();
+
+    // Verify exact character count and complete sentences
+    if (suggestion.length !== 500 || suggestion.endsWith('...')) {
+      console.error('Generated pitch does not meet requirements:', {
+        length: suggestion.length,
+        endsWithEllipsis: suggestion.endsWith('...'),
+        pitch: suggestion
+      });
+    }
 
     return new Response(
       JSON.stringify({ suggestion }),
