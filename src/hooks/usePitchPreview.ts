@@ -9,12 +9,9 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   const [hasGeneratedPitch, setHasGeneratedPitch] = useState(false);
 
   const formatPitchText = () => {
-    // Only show content if we have a generated pitch
-    if (!hasGeneratedPitch || !data.theme) {
+    if (!data.theme) {
       return "";
     }
-
-    // When we have a generated pitch, only show the theme
     return data.theme;
   };
 
@@ -59,7 +56,6 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   const handleRegenerate = async () => {
     if (onRegenerate && data as PitchFormData) {
       try {
-        setHasGeneratedPitch(false); // Reset the flag before generating
         await onRegenerate(data as PitchFormData, suggestions);
         setHasGeneratedPitch(true);
       } catch (error) {
@@ -76,7 +72,6 @@ export function usePitchPreview(data: Partial<PitchFormData>, onRegenerate?: (da
   const handleSendSuggestions = async () => {
     if (onRegenerate && suggestions.trim() && data as PitchFormData) {
       try {
-        setHasGeneratedPitch(false); // Reset the flag before generating
         await onRegenerate(data as PitchFormData, suggestions);
         setSuggestions("");
         setHasGeneratedPitch(true);
