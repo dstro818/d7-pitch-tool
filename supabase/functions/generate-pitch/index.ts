@@ -18,7 +18,7 @@ serve(async (req) => {
 
     const formattedTitle = `"${title}" by ${artists}`;
     
-    let prompt = `Generate a compelling music pitch between 490-500 characters using this information:
+    let prompt = `Generate a compelling music pitch between 490-520 characters using this information:
     Title: ${formattedTitle}
     Genres: ${genres?.join(', ')}
     Theme: ${theme || ''}
@@ -29,7 +29,7 @@ serve(async (req) => {
     ${suggestions ? `Additional suggestions: ${suggestions}` : ''}
 
     Critical Requirements:
-    1. The pitch must be between 490-500 characters
+    1. The pitch must be between 490-520 characters
     2. Must end with a complete, impactful sentence
     3. Include the most compelling aspects of the song and artist
     4. Format as a single flowing paragraph
@@ -52,7 +52,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music industry expert that creates compelling and concise song pitches. Generate pitches between 490-500 characters that end with complete, impactful sentences.'
+            content: 'You are a music industry expert that creates compelling and concise song pitches. Generate pitches between 490-520 characters that end with complete, impactful sentences.'
           },
           {
             role: 'user',
@@ -73,7 +73,7 @@ serve(async (req) => {
     const suggestion = data.choices[0].message.content.trim();
 
     // Verify character count and sentence completion
-    if (suggestion.length < 490 || suggestion.length > 500 || suggestion.endsWith('...')) {
+    if (suggestion.length < 490 || suggestion.length > 520 || suggestion.endsWith('...')) {
       console.error('Generated pitch does not meet requirements:', {
         length: suggestion.length,
         endsWithEllipsis: suggestion.endsWith('...'),
