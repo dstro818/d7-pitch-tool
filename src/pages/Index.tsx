@@ -91,10 +91,10 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">How It Works</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { step: "1", title: "Create Account", description: "Sign up in seconds" },
+              { step: "1", title: "Create Account", description: "Request Access - DSTRO7 will provide you credentials" },
               { step: "2", title: "Add Your Track", description: "Input your song details" },
               { step: "3", title: "Craft Your Pitch", description: "Use our AI-powered tools" },
-              { step: "4", title: "Submit & Track", description: "Monitor your success" }
+              { step: "4", title: "Save & Export", description: "Copy Text or Export Pitch to PDF" }
             ].map((step, index) => (
               <motion.div
                 key={index}
