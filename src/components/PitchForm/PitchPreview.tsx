@@ -24,13 +24,9 @@ export function PitchPreview({ data, onRegenerate, isGenerating = false }: Pitch
     handleSendSuggestions,
   } = usePitchPreview(data, onRegenerate);
 
-  // Show preview if we have content or are generating
-  const showPreview = isGenerating || data.theme || hasGeneratedPitch;
+  // Always show preview after first generation or when there's content
+  const showPreview = true;
   
-  if (!showPreview) {
-    return null;
-  }
-
   return (
     <Card className="w-full glass-card border-white/10">
       <CardHeader>
