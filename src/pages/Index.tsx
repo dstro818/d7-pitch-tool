@@ -43,8 +43,8 @@ const Index = () => {
             {[
               {
                 icon: <Target className="w-8 h-8 text-primary" />,
-                title: "Smart Targeting",
-                description: "AI-powered playlist matching for better acceptance rates"
+                title: "Pitch Perfect",
+                description: "Craft compelling pitches that resonate with playlist curators"
               },
               {
                 icon: <Zap className="w-8 h-8 text-primary" />,
