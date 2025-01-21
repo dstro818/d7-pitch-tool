@@ -3,9 +3,9 @@ project_id = "fttkdloraaraeqvijwtv"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
 
 [db]
+enabled = true
 port = 54322
 
 [studio]

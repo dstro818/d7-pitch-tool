@@ -16,10 +16,9 @@ serve(async (req) => {
   try {
     const { title, artists, genres, theme, production_elements, custom_production_elements, lyrics, artist_background, target_playlist, suggestions } = await req.json();
 
-    // Format the title with "by" instead of hyphen
     const formattedTitle = `"${title}" by ${artists}`;
 
-    let prompt = `Generate a compelling music pitch EXACTLY 500 characters or less using this information:
+    let prompt = `Generate a compelling music pitch that is EXACTLY 500 characters using this information:
     Title: ${formattedTitle}
     Genres: ${genres?.join(', ')}
     Theme: ${theme || ''}
@@ -29,14 +28,15 @@ serve(async (req) => {
     Target Playlist: ${target_playlist || ''}
     ${suggestions ? `Additional suggestions: ${suggestions}` : ''}
 
-    Format the pitch like this example:
-    "${title}" by ${artists}, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
-
     Important rules:
-    1. Response MUST be EXACTLY 500 characters or less
-    2. Don't use brackets for genres
-    3. Only include sections that have content
-    4. Make it flow naturally like a paragraph`;
+    1. The pitch MUST be EXACTLY 500 characters
+    2. End with a complete sentence - no ellipsis or truncated words
+    3. Include all relevant information in a natural, flowing paragraph
+    4. Focus on the most compelling aspects of the song and artist
+    5. Make sure the last sentence is complete and impactful
+
+    Example format:
+    "${title}" by ${artists} combines [genres] in this [theme description]. Featuring [production elements], this track [describe impact]. Notable lyrics: "[key lyrics]". [Artist background if relevant]. Perfect for [target playlist].`;
 
     console.log('Sending request to OpenAI with prompt:', prompt);
 
@@ -51,14 +51,13 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music industry expert that creates compelling and concise song pitches. Always ensure your response is exactly 500 characters or less.'
+            content: 'You are a music industry expert that creates compelling and concise song pitches. Always ensure your response is exactly 500 characters with complete sentences.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_tokens: 500,
         temperature: 0.7,
       }),
     });
