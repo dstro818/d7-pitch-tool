@@ -36,7 +36,7 @@ export function PreviewFooter({
         showPreview={showPreview}
       />
       
-      {showPreview && hasGeneratedPitch && !isGenerating && (
+      {showPreview && !isGenerating && (
         <Card className="w-full border-primary/20 bg-primary/5 shadow-lg">
           <CardContent className="pt-6">
             <PitchSuggestions
