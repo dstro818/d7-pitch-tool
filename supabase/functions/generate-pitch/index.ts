@@ -16,9 +16,11 @@ serve(async (req) => {
   try {
     const { title, artists, genres, theme, production_elements, custom_production_elements, lyrics, artist_background, target_playlist, suggestions } = await req.json();
 
+    // Format the title with "by" instead of hyphen
+    const formattedTitle = `"${title}" by ${artists}`;
+
     let prompt = `Generate a compelling music pitch EXACTLY 500 characters or less using this information:
-    Title: ${title}
-    Artists: ${artists}
+    Title: ${formattedTitle}
     Genres: ${genres?.join(', ')}
     Theme: ${theme || ''}
     Production Elements: ${[...(production_elements || []), ...(custom_production_elements || [])].join(', ')}
@@ -28,7 +30,7 @@ serve(async (req) => {
     ${suggestions ? `Additional suggestions: ${suggestions}` : ''}
 
     Format the pitch like this example:
-    "Song Title - Artist Name, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
+    "${title}" by ${artists}, Genre1, Genre2, Theme description. Featuring production element 1, production element 2. Notable lyrics: "example lyrics". Artist background details."
 
     Important rules:
     1. Response MUST be EXACTLY 500 characters or less
