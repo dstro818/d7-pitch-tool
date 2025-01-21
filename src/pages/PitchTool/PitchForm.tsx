@@ -45,11 +45,9 @@ export function PitchForm() {
         if (response.suggestion.length > 500) {
           const truncated = response.suggestion.slice(0, 497) + "...";
           setGeneratedTheme(truncated);
-          form.setValue('theme', truncated);
           return truncated;
         }
         setGeneratedTheme(response.suggestion);
-        form.setValue('theme', response.suggestion);
         return response.suggestion;
       }
     } catch (error) {
@@ -127,7 +125,7 @@ export function PitchForm() {
 
       <div className="lg:sticky lg:top-6 h-fit">
         <PitchPreview 
-          data={formValues}
+          data={{ ...formValues, theme: generatedTheme }}
           onRegenerate={generateAIPitch}
           isGenerating={isGenerating}
         />
