@@ -21,10 +21,10 @@ const Index = () => {
           className="glass-card p-8 backdrop-blur-sm"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary">
-            Craft Perfect Playlist Pitches Online
+            DSTRO7: Your Professional Playlist Pitch Partner
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-            Get Your Music Featured on More Playlists – Faster and Easier Than Ever!
+            Elevate Your Music's Reach with Expert Playlist Pitching Solutions
           </p>
           <Link to="/login">
             <Button size="lg" className="neon-border hover-glow bg-gradient-to-r from-primary to-accent hover:opacity-90">
