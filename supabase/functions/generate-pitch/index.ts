@@ -18,7 +18,7 @@ serve(async (req) => {
 
     const formattedTitle = `"${title}" by ${artists}`;
     
-    let prompt = `Generate a compelling music pitch that is EXACTLY 500 characters using this information:
+    let prompt = `Generate a compelling music pitch between 490-500 characters using this information:
     Title: ${formattedTitle}
     Genres: ${genres?.join(', ')}
     Theme: ${theme || ''}
@@ -29,14 +29,14 @@ serve(async (req) => {
     ${suggestions ? `Additional suggestions: ${suggestions}` : ''}
 
     Critical Requirements:
-    1. The pitch MUST be EXACTLY 500 characters - no more, no less
-    2. End with a complete sentence - never end mid-sentence or with "..."
+    1. The pitch must be between 490-500 characters
+    2. Must end with a complete, impactful sentence
     3. Include the most compelling aspects of the song and artist
     4. Format as a single flowing paragraph
-    5. Ensure the final sentence provides a strong conclusion about playlist fit or impact
-    6. If needed, adjust content to fit exactly 500 characters while maintaining complete thoughts
+    5. End with a strong conclusion about playlist fit or impact
+    6. Never end with ellipsis or mid-sentence
 
-    Example of a good 500-character pitch:
+    Example of a good pitch (500 characters):
     "Summer Nights" by The Dreamers blends Electronic and Pop into an enchanting summer anthem. With pulsing synths and dynamic percussion, this track captures the essence of warm evenings and endless possibilities. The chorus "Under starlit skies" resonates with dreamy vocals and atmospheric production. Drawing from their coastal roots, The Dreamers infuse authentic beach vibes into every note. This energetic yet laid-back track is perfect for Summer Hits playlists.`;
 
     console.log('Sending request to OpenAI with prompt:', prompt);
@@ -52,7 +52,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music industry expert that creates compelling and concise song pitches. Always ensure your response is exactly 500 characters with complete sentences and never ends mid-thought.'
+            content: 'You are a music industry expert that creates compelling and concise song pitches. Generate pitches between 490-500 characters that end with complete, impactful sentences.'
           },
           {
             role: 'user',
@@ -72,8 +72,8 @@ serve(async (req) => {
 
     const suggestion = data.choices[0].message.content.trim();
 
-    // Verify exact character count and complete sentences
-    if (suggestion.length !== 500 || suggestion.endsWith('...')) {
+    // Verify character count and sentence completion
+    if (suggestion.length < 490 || suggestion.length > 500 || suggestion.endsWith('...')) {
       console.error('Generated pitch does not meet requirements:', {
         length: suggestion.length,
         endsWithEllipsis: suggestion.endsWith('...'),
