@@ -8,8 +8,67 @@ import {
   MessageSquare, 
   ArrowRight
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
+  const [images, setImages] = useState({
+    hero: "",
+    features: ["", "", ""],
+    cta: ""
+  });
+
+  useEffect(() => {
+    const generateImages = async () => {
+      const prompts = {
+        hero: "A modern music studio control room with purple ambient lighting, showing a professional workspace for music production and playlist curation. The scene should emphasize technology and music industry professionalism.",
+        features: [
+          "A detailed close-up of a sleek playlist curation interface on a modern display, with purple and dark theme aesthetics",
+          "A dynamic visualization of music data and analytics with flowing purple waves and holographic elements",
+          "An AI assistant helping with music curation, represented by abstract purple and blue geometric patterns"
+        ],
+        cta: "A cinematic view of a successful musician working with advanced music technology, bathed in purple ambient lighting"
+      };
+
+      try {
+        // Generate hero image
+        const heroResponse = await supabase.functions.invoke('generate-image', {
+          body: { prompt: prompts.hero }
+        });
+        if (heroResponse.data?.data?.[0]?.url) {
+          setImages(prev => ({ ...prev, hero: heroResponse.data.data[0].url }));
+        }
+
+        // Generate feature images
+        const featureImages = await Promise.all(
+          prompts.features.map(prompt => 
+            supabase.functions.invoke('generate-image', {
+              body: { prompt }
+            })
+          )
+        );
+        
+        const featureUrls = featureImages
+          .map(response => response.data?.data?.[0]?.url)
+          .filter(Boolean);
+        
+        setImages(prev => ({ ...prev, features: featureUrls }));
+
+        // Generate CTA image
+        const ctaResponse = await supabase.functions.invoke('generate-image', {
+          body: { prompt: prompts.cta }
+        });
+        if (ctaResponse.data?.data?.[0]?.url) {
+          setImages(prev => ({ ...prev, cta: ctaResponse.data.data[0].url }));
+        }
+      } catch (error) {
+        console.error('Error generating images:', error);
+      }
+    };
+
+    generateImages();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -18,7 +77,7 @@ const Index = () => {
           {/* Background image with overlay */}
           <div className="absolute inset-0 -z-10 opacity-20">
             <img 
-              src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
+              src={images.hero || "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"}
               alt="Background"
               className="w-full h-full object-cover rounded-3xl"
             />
@@ -57,19 +116,16 @@ const Index = () => {
                 icon: <Target className="w-8 h-8 text-primary" />,
                 title: "Pitch Perfect",
                 description: "Craft compelling pitches that resonate with playlist curators",
-                image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
               },
               {
                 icon: <Zap className="w-8 h-8 text-primary" />,
                 title: "Quick Creation",
                 description: "Create professional pitches in minutes, not hours",
-                image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
               },
               {
                 icon: <MessageSquare className="w-8 h-8 text-primary" />,
                 title: "AI Enhancement",
                 description: "Get AI suggestions to improve your pitch success rate",
-                image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81"
               }
             ].map((feature, index) => (
               <motion.div
@@ -81,7 +137,7 @@ const Index = () => {
               >
                 <div className="relative h-40 mb-6 rounded-lg overflow-hidden">
                   <img 
-                    src={feature.image} 
+                    src={images.features[index] || `https://images.unsplash.com/photo-1581091226825-a6a2a5aee158`}
                     alt={feature.title}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
@@ -100,7 +156,7 @@ const Index = () => {
       <section className="py-16 bg-gradient-to-b from-background via-accent/5 to-background relative">
         <div className="absolute inset-0 -z-10 opacity-10">
           <img 
-            src="https://images.unsplash.com/photo-1721322800607-8c38375eef04"
+            src={images.cta || "https://images.unsplash.com/photo-1721322800607-8c38375eef04"}
             alt="Background"
             className="w-full h-full object-cover"
           />
