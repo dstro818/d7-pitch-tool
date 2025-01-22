@@ -6,10 +6,12 @@ import {
   Target, 
   Zap, 
   MessageSquare, 
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
   const [images, setImages] = useState({
@@ -17,6 +19,7 @@ const Index = () => {
     features: ["", "", ""],
     cta: ""
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const generateImages = async () => {
@@ -31,38 +34,46 @@ const Index = () => {
       };
 
       try {
+        setLoading(true);
+        console.log("Starting image generation...");
+
         // Generate hero image
         const heroResponse = await supabase.functions.invoke('generate-image', {
           body: { prompt: prompts.hero }
         });
+        console.log("Hero image response:", heroResponse);
         if (heroResponse.data?.data?.[0]?.url) {
           setImages(prev => ({ ...prev, hero: heroResponse.data.data[0].url }));
         }
 
         // Generate feature images
         const featureImages = await Promise.all(
-          prompts.features.map(prompt => 
-            supabase.functions.invoke('generate-image', {
+          prompts.features.map(async (prompt) => {
+            const response = await supabase.functions.invoke('generate-image', {
               body: { prompt }
-            })
-          )
+            });
+            console.log("Feature image response:", response);
+            return response.data?.data?.[0]?.url;
+          })
         );
         
-        const featureUrls = featureImages
-          .map(response => response.data?.data?.[0]?.url)
-          .filter(Boolean);
-        
-        setImages(prev => ({ ...prev, features: featureUrls }));
+        setImages(prev => ({ ...prev, features: featureImages }));
 
         // Generate CTA image
         const ctaResponse = await supabase.functions.invoke('generate-image', {
           body: { prompt: prompts.cta }
         });
+        console.log("CTA image response:", ctaResponse);
         if (ctaResponse.data?.data?.[0]?.url) {
           setImages(prev => ({ ...prev, cta: ctaResponse.data.data[0].url }));
         }
+
+        toast.success("Images generated successfully!");
       } catch (error) {
         console.error('Error generating images:', error);
+        toast.error("Failed to generate images. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -76,11 +87,17 @@ const Index = () => {
         <div className="relative">
           {/* Background image with overlay */}
           <div className="absolute inset-0 -z-10 opacity-20">
-            <img 
-              src={images.hero || "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"}
-              alt="Background"
-              className="w-full h-full object-cover rounded-3xl"
-            />
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <img 
+                src={images.hero || "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"}
+                alt="Background"
+                className="w-full h-full object-cover rounded-3xl"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
           </div>
           
@@ -136,11 +153,17 @@ const Index = () => {
                 className="glass-card p-6 hover:bg-gradient-to-br hover:from-primary/10 hover:to-accent/10 transition-all duration-300 overflow-hidden"
               >
                 <div className="relative h-40 mb-6 rounded-lg overflow-hidden">
-                  <img 
-                    src={images.features[index] || `https://images.unsplash.com/photo-1581091226825-a6a2a5aee158`}
-                    alt={feature.title}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  ) : (
+                    <img 
+                      src={images.features[index] || `https://images.unsplash.com/photo-1581091226825-a6a2a5aee158`}
+                      alt={feature.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                 </div>
                 <div className="mb-4">{feature.icon}</div>
@@ -155,11 +178,17 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-b from-background via-accent/5 to-background relative">
         <div className="absolute inset-0 -z-10 opacity-10">
-          <img 
-            src={images.cta || "https://images.unsplash.com/photo-1721322800607-8c38375eef04"}
-            alt="Background"
-            className="w-full h-full object-cover"
-          />
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <img 
+              src={images.cta || "https://images.unsplash.com/photo-1721322800607-8c38375eef04"}
+              alt="Background"
+              className="w-full h-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-background via-background/50 to-background" />
         </div>
         <div className="container mx-auto px-6 text-center relative z-10">
