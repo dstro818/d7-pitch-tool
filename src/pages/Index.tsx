@@ -7,99 +7,21 @@ import {
   Zap, 
   MessageSquare, 
   ArrowRight,
-  Loader2
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const Index = () => {
-  const [images, setImages] = useState({
-    hero: "",
-    features: ["", "", ""],
-    cta: ""
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const generateImages = async () => {
-      const prompts = {
-        hero: "A modern music studio control room with purple ambient lighting, showing a professional workspace for music production and playlist curation. The scene should emphasize technology and music industry professionalism.",
-        features: [
-          "A detailed close-up of a sleek playlist curation interface on a modern display, with purple and dark theme aesthetics",
-          "A dynamic visualization of music data and analytics with flowing purple waves and holographic elements",
-          "An AI assistant helping with music curation, represented by abstract purple and blue geometric patterns"
-        ],
-        cta: "A cinematic view of a successful musician working with advanced music technology, bathed in purple ambient lighting"
-      };
-
-      try {
-        setLoading(true);
-        console.log("Starting image generation...");
-
-        // Generate hero image
-        const heroResponse = await supabase.functions.invoke('generate-image', {
-          body: { prompt: prompts.hero }
-        });
-        
-        if (heroResponse.error) {
-          throw new Error(`Hero image generation failed: ${heroResponse.error.message}`);
-        }
-        
-        if (heroResponse.data?.data?.[0]?.url) {
-          setImages(prev => ({ ...prev, hero: heroResponse.data.data[0].url }));
-        }
-
-        // Generate feature images sequentially to avoid rate limits
-        const featureImages = [];
-        for (const prompt of prompts.features) {
-          const response = await supabase.functions.invoke('generate-image', {
-            body: { prompt }
-          });
-          
-          if (response.error) {
-            throw new Error(`Feature image generation failed: ${response.error.message}`);
-          }
-          
-          featureImages.push(response.data?.data?.[0]?.url || "");
-        }
-        
-        setImages(prev => ({ ...prev, features: featureImages }));
-
-        // Generate CTA image
-        const ctaResponse = await supabase.functions.invoke('generate-image', {
-          body: { prompt: prompts.cta }
-        });
-        
-        if (ctaResponse.error) {
-          throw new Error(`CTA image generation failed: ${ctaResponse.error.message}`);
-        }
-        
-        if (ctaResponse.data?.data?.[0]?.url) {
-          setImages(prev => ({ ...prev, cta: ctaResponse.data.data[0].url }));
-        }
-
-        toast.success("Images generated successfully!");
-      } catch (error) {
-        console.error('Error generating images:', error);
-        toast.error("Failed to generate images. Please try again later.");
-        // Set fallback images on error
-        setImages({
-          hero: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
-          features: [
-            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
-          ],
-          cta: "https://images.unsplash.com/photo-1721322800607-8c38375eef04"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    generateImages();
-  }, []);
+  const images = {
+    // Modern studio with purple lighting
+    hero: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04",
+    // Tech and music related images for features
+    features: [
+      "https://images.unsplash.com/photo-1598653222000-6b7b7a552625", // Playlist interface
+      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745", // Music visualization
+      "https://images.unsplash.com/photo-1511379938547-c1f69419868d"  // Music tech
+    ],
+    // Professional music workspace
+    cta: "https://images.unsplash.com/photo-1598628461950-268968751a2e"
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -108,17 +30,11 @@ const Index = () => {
         <div className="relative">
           {/* Background image with overlay */}
           <div className="absolute inset-0 -z-10 opacity-20">
-            {loading ? (
-              <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <img 
-                src={images.hero || "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"}
-                alt="Background"
-                className="w-full h-full object-cover rounded-3xl"
-              />
-            )}
+            <img 
+              src={images.hero}
+              alt="Background"
+              className="w-full h-full object-cover rounded-3xl"
+            />
             <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
           </div>
           
@@ -154,16 +70,19 @@ const Index = () => {
                 icon: <Target className="w-8 h-8 text-primary" />,
                 title: "Pitch Perfect",
                 description: "Craft compelling pitches that resonate with playlist curators",
+                image: images.features[0]
               },
               {
                 icon: <Zap className="w-8 h-8 text-primary" />,
                 title: "Quick Creation",
                 description: "Create professional pitches in minutes, not hours",
+                image: images.features[1]
               },
               {
                 icon: <MessageSquare className="w-8 h-8 text-primary" />,
                 title: "AI Enhancement",
                 description: "Get AI suggestions to improve your pitch success rate",
+                image: images.features[2]
               }
             ].map((feature, index) => (
               <motion.div
@@ -174,17 +93,11 @@ const Index = () => {
                 className="glass-card p-6 hover:bg-gradient-to-br hover:from-primary/10 hover:to-accent/10 transition-all duration-300 overflow-hidden"
               >
                 <div className="relative h-40 mb-6 rounded-lg overflow-hidden">
-                  {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    </div>
-                  ) : (
-                    <img 
-                      src={images.features[index] || `https://images.unsplash.com/photo-1581091226825-a6a2a5aee158`}
-                      alt={feature.title}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                  )}
+                  <img 
+                    src={feature.image}
+                    alt={feature.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                 </div>
                 <div className="mb-4">{feature.icon}</div>
@@ -199,17 +112,11 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-b from-background via-accent/5 to-background relative">
         <div className="absolute inset-0 -z-10 opacity-10">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <img 
-              src={images.cta || "https://images.unsplash.com/photo-1721322800607-8c38375eef04"}
-              alt="Background"
-              className="w-full h-full object-cover"
-            />
-          )}
+          <img 
+            src={images.cta}
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-background via-background/50 to-background" />
         </div>
         <div className="container mx-auto px-6 text-center relative z-10">
