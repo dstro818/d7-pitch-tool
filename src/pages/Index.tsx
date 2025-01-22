@@ -41,21 +41,28 @@ const Index = () => {
         const heroResponse = await supabase.functions.invoke('generate-image', {
           body: { prompt: prompts.hero }
         });
-        console.log("Hero image response:", heroResponse);
+        
+        if (heroResponse.error) {
+          throw new Error(`Hero image generation failed: ${heroResponse.error.message}`);
+        }
+        
         if (heroResponse.data?.data?.[0]?.url) {
           setImages(prev => ({ ...prev, hero: heroResponse.data.data[0].url }));
         }
 
-        // Generate feature images
-        const featureImages = await Promise.all(
-          prompts.features.map(async (prompt) => {
-            const response = await supabase.functions.invoke('generate-image', {
-              body: { prompt }
-            });
-            console.log("Feature image response:", response);
-            return response.data?.data?.[0]?.url;
-          })
-        );
+        // Generate feature images sequentially to avoid rate limits
+        const featureImages = [];
+        for (const prompt of prompts.features) {
+          const response = await supabase.functions.invoke('generate-image', {
+            body: { prompt }
+          });
+          
+          if (response.error) {
+            throw new Error(`Feature image generation failed: ${response.error.message}`);
+          }
+          
+          featureImages.push(response.data?.data?.[0]?.url || "");
+        }
         
         setImages(prev => ({ ...prev, features: featureImages }));
 
@@ -63,7 +70,11 @@ const Index = () => {
         const ctaResponse = await supabase.functions.invoke('generate-image', {
           body: { prompt: prompts.cta }
         });
-        console.log("CTA image response:", ctaResponse);
+        
+        if (ctaResponse.error) {
+          throw new Error(`CTA image generation failed: ${ctaResponse.error.message}`);
+        }
+        
         if (ctaResponse.data?.data?.[0]?.url) {
           setImages(prev => ({ ...prev, cta: ctaResponse.data.data[0].url }));
         }
@@ -72,6 +83,16 @@ const Index = () => {
       } catch (error) {
         console.error('Error generating images:', error);
         toast.error("Failed to generate images. Please try again later.");
+        // Set fallback images on error
+        setImages({
+          hero: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+          features: [
+            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+          ],
+          cta: "https://images.unsplash.com/photo-1721322800607-8c38375eef04"
+        });
       } finally {
         setLoading(false);
       }
