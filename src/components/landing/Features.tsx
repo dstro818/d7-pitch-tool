@@ -13,13 +13,13 @@ const Features = () => {
       icon: <Zap className="w-8 h-8 text-primary" />,
       title: "Quick Creation",
       description: "Create professional pitches in minutes, not hours",
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745"
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
     },
     {
       icon: <MessageSquare className="w-8 h-8 text-primary" />,
       title: "AI Enhancement",
       description: "Get AI suggestions to improve your pitch success rate",
-      image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d"
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
     }
   ];
 
