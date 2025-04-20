@@ -1,6 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Hero = () => {
@@ -24,18 +25,31 @@ const Hero = () => {
           transition={{ duration: 0.8 }}
           className="glass-card p-8 backdrop-blur-sm"
         >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+            <span className="text-sm font-medium text-primary">AI-Powered Playlist Pitching</span>
+          </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary">
             DSTRO7: Your Professional Playlist Pitch Partner
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-            Elevate Your Music's Reach with Expert Playlist Pitching Solutions
+          <p className="text-xl md:text-2xl mb-4 text-muted-foreground">
+            Elevate Your Music's Reach with Expert Playlist Pitching Solutions, Trained on Thousands of Successful Submissions
           </p>
-          <Link to="/login">
-            <Button size="lg" className="neon-border hover-glow bg-gradient-to-r from-primary to-accent hover:opacity-90">
-              Start Pitching Now
-              <ArrowRight className="ml-2" />
-            </Button>
-          </Link>
+          <p className="text-lg mb-8 text-muted-foreground">
+            Our AI analyzes successful playlist placements to craft personalized, compelling pitches that resonate with curators
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/login">
+              <Button size="lg" className="neon-border hover-glow bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                Start Pitching Now
+                <ArrowRight className="ml-2" />
+              </Button>
+            </Link>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Zap className="w-5 h-5 text-primary" />
+              <span>Trained on 10,000+ successful pitches</span>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
